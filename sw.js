@@ -2,8 +2,8 @@
    Online: always the newest app + program (updates land on next open).
    Offline: last cached copy of everything, so gym dead-zones don't matter. */
 
-const CACHE = "bench-block-v1";
-const SHELL = ["./", "index.html", "style.css", "app.js", "program.json", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
+const CACHE = "bench-block-v2";
+const SHELL = ["./", "index.html", "style.css", "app.js", "analytics.js", "graphs.js", "program.json", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
 	e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

@@ -39,8 +39,23 @@ and prescribed weights — logs never touch the repo). Live at
 https://sambelow6-coder.github.io/Bench-Block/ . Claude pushes updates from
 Sam's PC; Pages redeploys itself and both phones update on next open.
 
+## Single-source rule
+A training fact is computed in exactly ONE place and every consumer calls it:
+- movement identity (display name, `lift` for e1RM pooling, muscle `tags`) lives
+  once in `program.json` → `library`; weeks carry only the prescription
+  (`sets`/`reps`/`pct`/`rx`). Tagging a movement retroactively re-tags every set
+  ever logged against it.
+- derived numbers (e1RM, tonnage, hard sets, drift, adherence) live in
+  `analytics.js`. `graphs.js` only draws what analytics returns — never
+  recompute a training number in a chart.
+- `reps` and `pct` may be a number or `{sam: n, manny: n}`; resolve with
+  `perPerson()`, never inline the branch.
+
 ## Files
 - `program.json` — the current program (single source of truth, coach-written)
+- `analytics.js` — all derivation from the log (pure, no rendering)
+- `graphs.js` — SVG chart primitives + the Graphs and Program pages
+- `history/` — per-block compact summaries so old logs aren't re-read weekly
 - `index.html` / `style.css` / `app.js` — the app (no build step, no deps)
 - `sw.js` — network-first service worker (fresh online, functional offline)
 - `manifest.webmanifest` + `icons/` — installability (add to home screen)

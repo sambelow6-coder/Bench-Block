@@ -1,5 +1,5 @@
 {
-	"program_version": 5,
+	"program_version": 6,
 	"meso": "Mesocycle 1 — Bench Focus",
 	"title": "Bench Block 1",
 	"current_week": 1,
@@ -15,6 +15,37 @@
 		{ "id": "knee_am", "person": "manny", "label": "Morning knee check", "hint": "0 = silent, 5 = angry. Compare to yesterday morning." },
 		{ "id": "back_am", "person": "sam", "label": "Morning back check", "hint": "0 = silent, 5 = angry. Block-1 watch while the pulls ramp." }
 	],
+
+	"__library_note": "Identity of a movement lives here ONCE: display name, which lift it pools into for e1RM, and the muscles it trains. Weeks carry only the prescription (sets/reps/pct/rx). Tagging a movement here retroactively re-tags every set ever logged against it.",
+	"library": {
+		"bench_heavy":     { "name": "Comp Bench — heavy",    "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
+		"bench_backoff":   { "name": "Comp Bench — back-off", "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
+		"bench_volume":    { "name": "Comp Bench — volume",   "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
+		"bench_moderate":  { "name": "Comp Bench — moderate", "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
+		"cg_bench":        { "name": "Close-Grip Bench",      "lift": "close-grip bench", "tags": ["triceps", "chest", "front delt"] },
+		"incline_bb":      { "name": "Incline Barbell Press", "lift": "incline bench",    "tags": ["chest", "front delt", "triceps"] },
+		"squat":           { "name": "Squat",                 "lift": "squat",            "tags": ["quads", "glutes", "hams"] },
+		"deadlift":        { "name": "Deadlift",              "lift": "deadlift",         "tags": ["hams", "glutes", "upper back"] },
+		"cs_row":          { "name": "Chest-Supported Row",   "tags": ["upper back", "lats", "biceps"] },
+		"lat_pulldown":    { "name": "Lat Pulldown",          "tags": ["lats", "upper back", "biceps"] },
+		"cable_row":       { "name": "Seated Cable Row",      "tags": ["upper back", "lats", "biceps"] },
+		"oa_row":          { "name": "One-Arm DB Row",        "tags": ["lats", "upper back", "biceps"] },
+		"pullups":         { "name": "Pull-Ups",              "tags": ["lats", "upper back", "biceps"], "amrap": true },
+		"cable_pushdown":  { "name": "Cable Pushdown",        "tags": ["triceps"] },
+		"rope_pushdown":   { "name": "Rope Pushdown",         "tags": ["triceps"] },
+		"oh_ext":          { "name": "Overhead Cable Extension", "tags": ["triceps"] },
+		"machine_dip":     { "name": "Machine Dip / Pushdown", "tags": ["triceps"] },
+		"curls":           { "name": "Curls",                 "tags": ["biceps"] },
+		"sat_curls":       { "name": "Curls",                 "tags": ["biceps"] },
+		"leg_press":       { "name": "Leg Press",             "tags": ["quads", "glutes"] },
+		"hsr_leg_press":   { "name": "HSR Leg Press",         "tags": ["quads", "glutes"] },
+		"leg_extension":   { "name": "Leg Extension",         "tags": ["quads"] },
+		"ham_curl":        { "name": "Hamstring Curl",        "tags": ["hams"] },
+		"spanish_squat":   { "name": "Spanish Squat — isometric", "tags": ["quads"], "timed": true },
+		"wall_sit":        { "name": "Wall Sit",              "tags": ["quads"], "timed": true },
+		"core":            { "name": "Core",                  "tags": ["core"] }
+	},
+
 	"weeks": [
 		{
 			"week": 1,
@@ -23,57 +54,57 @@
 				{
 					"key": "mon", "title": "Heavy Bench",
 					"exercises": [
-						{ "id": "bench_heavy", "name": "Comp Bench — heavy", "for": "both", "sets": 3,
+						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": 80,
 						  "rx": { "sam": "250 lb — 3×5 (80%) · RPE 7–8", "manny": "270 lb — 3×5 (80%) · RPE 7–8" } },
-						{ "id": "bench_backoff", "name": "Comp Bench — back-off", "for": "both", "sets": 2,
+						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": 72.5,
 						  "rx": { "sam": "230 lb — 2×8 (72.5%)", "manny": "245 lb — 2×8 (72.5%)" } },
-						{ "id": "cs_row", "name": "Chest-Supported Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "lat_pulldown", "name": "Lat Pulldown", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "cable_pushdown", "name": "Cable Pushdown", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" }
+						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "lat_pulldown", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "cable_pushdown", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" }
 					]
 				},
 				{
 					"key": "tue", "title": "Legs",
 					"exercises": [
-						{ "id": "squat", "name": "Squat", "for": "sam", "sets": 3, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
-						{ "id": "leg_press", "name": "Leg Press", "for": "sam", "sets": 3, "rx": "3×10 · RPE 7" },
-						{ "id": "ham_curl", "name": "Hamstring Curl", "for": "sam", "sets": 3, "rx": "3×12 · RPE 7–8" },
-						{ "id": "spanish_squat", "name": "Spanish Squat — isometric", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
-						{ "id": "hsr_leg_press", "name": "HSR Leg Press", "for": "manny", "sets": 4, "rx": "4×8 · RPE 6–7 · strict 3 sec down / 3 sec up" },
-						{ "id": "leg_extension", "name": "Leg Extension", "for": "manny", "sets": 3, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
-						{ "id": "core", "name": "Core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
+						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 70, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
+						{ "id": "leg_press", "for": "sam", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7" },
+						{ "id": "ham_curl", "for": "sam", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
+						{ "id": "spanish_squat", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
+						{ "id": "hsr_leg_press", "for": "manny", "sets": 4, "reps": 8, "rx": "4×8 · RPE 6–7 · strict 3 sec down / 3 sec up" },
+						{ "id": "leg_extension", "for": "manny", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
+						{ "id": "core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
 					]
 				},
 				{
 					"key": "wed", "title": "Volume Bench",
 					"exercises": [
-						{ "id": "bench_volume", "name": "Comp Bench — volume", "for": "both", "sets": 4,
+						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": 72.5,
 						  "rx": { "sam": "230 lb — 4×6 (72.5%) · RPE 7–8", "manny": "245 lb — 4×6 (72.5%) · RPE 7–8" } },
-						{ "id": "incline_bb", "name": "Incline Barbell Press", "for": "both", "sets": 3, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
-						{ "id": "cable_row", "name": "Seated Cable Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" },
-						{ "id": "machine_dip", "name": "Machine Dip / Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · push to RPE 9–10 if you like" }
+						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": 10, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
+						{ "id": "cable_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "curls", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" },
+						{ "id": "machine_dip", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · push to RPE 9–10 if you like" }
 					]
 				},
 				{
 					"key": "fri", "title": "Variation",
 					"exercises": [
-						{ "id": "cg_bench", "name": "Close-Grip Bench", "for": "both", "sets": 4, "rx": "4×6 · RPE 7–8" },
-						{ "id": "oh_ext", "name": "Overhead Cable Extension", "for": "both", "sets": 3, "rx": "3×12 · RPE 7–8" },
-						{ "id": "oa_row", "name": "One-Arm DB Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
-						{ "id": "rope_pushdown", "name": "Rope Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · RPE 7–8" }
+						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
+						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
+						{ "id": "oa_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
+						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 7–8" }
 					]
 				},
 				{
 					"key": "sat", "title": "Moderate Bench + Pull",
 					"exercises": [
-						{ "id": "bench_moderate", "name": "Comp Bench — moderate", "for": "both", "sets": 5,
+						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": 75,
 						  "rx": { "sam": "235 lb — 5×3 (75%) · RPE 6–7", "manny": "250 lb — 5×3 (75%) · RPE 6–7" } },
-						{ "id": "deadlift", "name": "Deadlift", "for": "both", "sets": 3,
+						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 75 },
 						  "rx": { "sam": "320 lb — 3×3 (75%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
-						{ "id": "pullups", "name": "Pull-Ups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
-						{ "id": "sat_curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "wall_sit", "name": "Wall Sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
+						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
+						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
 					]
 				}
 			]
@@ -86,57 +117,57 @@
 				{
 					"key": "mon", "title": "Heavy Bench",
 					"exercises": [
-						{ "id": "bench_heavy", "name": "Comp Bench — heavy", "for": "both", "sets": 3,
+						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": 80,
 						  "rx": { "sam": "250 lb — 3×5 (80%) · RPE 7–8", "manny": "270 lb — 3×5 (80%) · RPE 7–8" } },
-						{ "id": "bench_backoff", "name": "Comp Bench — back-off", "for": "both", "sets": 2,
+						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": 72.5,
 						  "rx": { "sam": "230 lb — 2×8 (72.5%)", "manny": "245 lb — 2×8 (72.5%)" } },
-						{ "id": "cs_row", "name": "Chest-Supported Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "lat_pulldown", "name": "Lat Pulldown", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "cable_pushdown", "name": "Cable Pushdown", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" }
+						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "lat_pulldown", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "cable_pushdown", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" }
 					]
 				},
 				{
 					"key": "tue", "title": "Legs",
 					"exercises": [
-						{ "id": "squat", "name": "Squat", "for": "sam", "sets": 3, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
-						{ "id": "leg_press", "name": "Leg Press", "for": "sam", "sets": 3, "rx": "3×10 · RPE 7" },
-						{ "id": "ham_curl", "name": "Hamstring Curl", "for": "sam", "sets": 3, "rx": "3×12 · RPE 7–8" },
-						{ "id": "spanish_squat", "name": "Spanish Squat — isometric", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
-						{ "id": "hsr_leg_press", "name": "HSR Leg Press", "for": "manny", "sets": 4, "rx": "4×8 · RPE 6–7 · strict 3 sec down / 3 sec up" },
-						{ "id": "leg_extension", "name": "Leg Extension", "for": "manny", "sets": 3, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
-						{ "id": "core", "name": "Core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
+						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 70, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
+						{ "id": "leg_press", "for": "sam", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7" },
+						{ "id": "ham_curl", "for": "sam", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
+						{ "id": "spanish_squat", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
+						{ "id": "hsr_leg_press", "for": "manny", "sets": 4, "reps": 8, "rx": "4×8 · RPE 6–7 · strict 3 sec down / 3 sec up" },
+						{ "id": "leg_extension", "for": "manny", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
+						{ "id": "core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
 					]
 				},
 				{
 					"key": "wed", "title": "Volume Bench",
 					"exercises": [
-						{ "id": "bench_volume", "name": "Comp Bench — volume", "for": "both", "sets": 4,
+						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": 72.5,
 						  "rx": { "sam": "230 lb — 4×6 (72.5%) · RPE 7–8", "manny": "245 lb — 4×6 (72.5%) · RPE 7–8" } },
-						{ "id": "incline_bb", "name": "Incline Barbell Press", "for": "both", "sets": 3, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
-						{ "id": "cable_row", "name": "Seated Cable Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" },
-						{ "id": "machine_dip", "name": "Machine Dip / Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · push to RPE 9–10 if you like" }
+						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": 10, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
+						{ "id": "cable_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "curls", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" },
+						{ "id": "machine_dip", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · push to RPE 9–10 if you like" }
 					]
 				},
 				{
 					"key": "fri", "title": "Variation",
 					"exercises": [
-						{ "id": "cg_bench", "name": "Close-Grip Bench", "for": "both", "sets": 4, "rx": "4×6 · RPE 7–8" },
-						{ "id": "oh_ext", "name": "Overhead Cable Extension", "for": "both", "sets": 3, "rx": "3×12 · RPE 7–8" },
-						{ "id": "oa_row", "name": "One-Arm DB Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
-						{ "id": "rope_pushdown", "name": "Rope Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · RPE 7–8" }
+						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
+						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
+						{ "id": "oa_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
+						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 7–8" }
 					]
 				},
 				{
 					"key": "sat", "title": "Moderate Bench + Pull",
 					"exercises": [
-						{ "id": "bench_moderate", "name": "Comp Bench — moderate", "for": "both", "sets": 5,
+						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": 75,
 						  "rx": { "sam": "235 lb — 5×3 (75%) · RPE 6–7", "manny": "250 lb — 5×3 (75%) · RPE 6–7" } },
-						{ "id": "deadlift", "name": "Deadlift", "for": "both", "sets": 3,
+						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 75 },
 						  "rx": { "sam": "320 lb — 3×3 (75%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
-						{ "id": "pullups", "name": "Pull-Ups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
-						{ "id": "sat_curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
-						{ "id": "wall_sit", "name": "Wall Sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
+						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
+						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
 					]
 				}
 			]

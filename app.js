@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.7";
+const APP_VERSION = "v1.8";
 
 /* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
    browser cannot read a success response. Hence no-cors, "resend everything"
@@ -28,6 +28,7 @@ let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
 let selectedDay = null;
 let viewWeek = null;
+let view = "log";
 let entries = load(LS_ENTRIES, []);
 
 const DAY_OFFSET = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
@@ -189,6 +190,13 @@ async function loadProgram() {
 	}
 	// back-compat: wrap a cached single-week program into the weeks shape
 	if (!prog.weeks) prog.weeks = [{ week: prog.week || 1, week_of: prog.week_of, days: prog.days }];
+	// movement identity (name/tags/lift) lives once in the library; fold it in so
+	// every consumer — cards, graphs, coach — sees one merged def
+	for (const w of prog.weeks) {
+		for (const d of w.days) {
+			d.exercises = d.exercises.map(ex => Object.assign({}, (prog.library || {})[ex.id] || {}, ex));
+		}
+	}
 	if (!prog.current_week) prog.current_week = prog.weeks[0].week;
 	if (!viewWeek || !prog.weeks.some(w => w.week === viewWeek)) viewWeek = prog.current_week;
 	if (!selectedDay) selectedDay = defaultDay();
@@ -210,16 +218,30 @@ function dayKeyToday() {
 
 function renderAll() {
 	renderHeader();
-	renderTabs();
-	renderCheckin();
-	renderDay();
+	renderViewTabs();
+	if (view === "log") {
+		el("day-tabs").classList.remove("hidden");
+		renderTabs();
+		renderCheckin();
+		renderDay();
+	} else {
+		el("day-tabs").classList.add("hidden");
+		if (view === "graphs") renderGraphs();
+		else renderProgramView();
+	}
 	renderFooter();
+}
+
+function renderViewTabs() {
+	document.querySelectorAll(".view-tab").forEach(b => {
+		b.classList.toggle("active", b.dataset.view === view);
+	});
 }
 
 function renderHeader() {
 	const w = weekDef();
-	el("app-title").innerHTML = "Bench Block — Week " + w.week + ' <span id="week-caret">▾</span>';
-	el("week-label").textContent = "wk of " + w.week_of + " · tap to browse weeks";
+	el("app-title").innerHTML = "Week " + w.week + ' <span id="week-caret">▾</span>';
+	el("week-label").textContent = "wk of " + w.week_of + " · browse weeks";
 	el("brand").onclick = cycleModal;
 	document.querySelectorAll(".person-btn").forEach(b => {
 		b.classList.toggle("active", b.dataset.person === person);
@@ -241,10 +263,11 @@ function renderCheckin() {
 	if (!ci) { slot.innerHTML = ""; return; }
 	const rec = findEntry({ type: "checkin", person, date: todayStr(), ex: ci.id });
 	const sleep = findEntry({ type: "sleep", person, date: todayStr() });
+	const bw = findEntry({ type: "bodyweight", person, date: todayStr() });
 	const noteBtn = `<button class="note-btn ${rec && rec.note ? "has-note" : ""}" data-ci-note="${ci.id}">✎</button>`;
 	slot.innerHTML = `
 		<div class="card checkin">
-			<div class="ex-name"><span class="ci-title">${esc(ci.label)} — today</span>${noteBtn}</div>
+			<div class="ex-name"><span class="ci-title">${esc(ci.label)} — ${todayStr() === dayDateStr(weekDef(), selectedDay) ? "today" : "today (" + todayStr().slice(5) + ")"}</span>${noteBtn}</div>
 			<div class="ci-hint">${esc(ci.hint)}</div>
 			<div class="scale-row">${[0, 1, 2, 3, 4, 5].map(n =>
 				`<button class="scale-btn ${rec && rec.rating === n ? "sel" : ""}" data-ci="${ci.id}" data-val="${n}">${n}</button>`
@@ -254,6 +277,11 @@ function renderCheckin() {
 			<div class="sleep-row">
 				<input class="modal-input" id="sleep-input" type="number" step="0.5" min="0" max="24" inputmode="decimal" placeholder="7.5" value="${sleep && sleep.hours != null ? sleep.hours : ""}">
 				<button class="modal-btn primary" id="sleep-save">${sleep && sleep.hours != null ? "update" : "save"}</button>
+			</div>
+			<div class="ci-hint sleep-label">Bodyweight (lb) — weekly is plenty</div>
+			<div class="sleep-row">
+				<input class="modal-input" id="bw-input" type="number" step="0.2" min="0" max="600" inputmode="decimal" placeholder="185" value="${bw && bw.lb != null ? bw.lb : ""}">
+				<button class="modal-btn primary" id="bw-save">${bw && bw.lb != null ? "update" : "save"}</button>
 			</div>
 		</div>`;
 	slot.querySelectorAll("[data-ci]").forEach(b => {
@@ -268,6 +296,13 @@ function renderCheckin() {
 		upsert({ type: "sleep", person, date: todayStr() }, { hours: v });
 		renderCheckin(); renderFooter();
 		toast("Sleep logged: " + v + " hrs");
+	};
+	el("bw-save").onclick = () => {
+		const v = parseFloat(el("bw-input").value);
+		if (isNaN(v) || v <= 0 || v > 600) { toast("Enter pounds, e.g. 185", true); return; }
+		upsert({ type: "bodyweight", person, date: todayStr() }, { lb: v });
+		renderCheckin(); renderFooter();
+		toast("Bodyweight logged: " + v + " lb");
 	};
 	const nb = slot.querySelector("[data-ci-note]");
 	if (nb) nb.onclick = async () => {
@@ -324,7 +359,11 @@ function renderDay() {
 
 	// ad-hoc additions for this person/date/day
 	for (const add of entries.filter(e => e.type === "add" && !e.retracted && e.person === person && e.date === date && e.day === day.key)) {
-		html += exerciseCard({ id: "add:" + add.id, name: add.exName + " (added)", for: person, sets: 5, rx: add.note ? "added: " + add.note : "added today" }, date, day.key);
+		html += exerciseCard({
+			id: "add:" + add.id, name: add.exName + " (added)", for: person,
+			sets: add.sets || 3, reps: add.reps || null, tags: add.tags || [],
+			rx: (add.reps ? (add.sets || 3) + "×" + add.reps + " · " : "") + (add.note ? "added: " + add.note : "added today")
+		}, date, day.key);
 	}
 
 	html += `
@@ -363,14 +402,21 @@ function exerciseCard(ex, date, dayKey) {
 		html += `<div class="ex-skip-line">skipped${skipRec.note ? " — “" + esc(skipRec.note) + "”" : ""}
 			<button class="linkish" data-exunskip="${ex.id}">un-skip</button></div>`;
 	} else if (mine) {
+		const rxReps = perPerson(ex.reps, person);
 		let bubbles = "";
 		for (let s = 1; s <= ex.sets; s++) {
 			const rec = findEntry({ type: "set", person, date, ex: ex.id, set: s });
-			const done = rec && rec.rpe !== null && rec.rpe !== undefined;
-			const label = done
-				? `<span>${rec.rpe === 5 ? "≤5" : rec.rpe}</span>${rec.weight != null ? `<span class="sub">${rec.weight}</span>` : ""}`
-				: s;
-			bubbles += `<button class="set-bubble ${done ? "done" : ""}" data-set-ex="${ex.id}" data-set-name="${esc(ex.name)}" data-set="${s}">${label}</button>`;
+			const skipped = rec && rec.skipped;
+			const done = !skipped && rec && rec.rpe !== null && rec.rpe !== undefined;
+			let label = s;
+			if (skipped) label = `<span>—</span>`;
+			else if (done) {
+				// only surface reps when they differ from what was prescribed
+				const shortfall = rec.reps != null && rxReps != null && rec.reps !== rxReps;
+				const sub = rec.weight != null ? rec.weight + (shortfall ? "×" + rec.reps : "") : (shortfall ? rec.reps + " reps" : "");
+				label = `<span>${rec.rpe === 5 ? "≤5" : rec.rpe}</span>${sub ? `<span class="sub">${sub}</span>` : ""}`;
+			}
+			bubbles += `<button class="set-bubble ${done ? "done" : ""} ${skipped ? "skipped" : ""}" data-set-ex="${ex.id}" data-set-name="${esc(ex.name)}" data-set="${s}">${label}</button>`;
 		}
 		html += `<div class="sets-row">${bubbles}</div>`;
 		html += feelRow(ex, date);
@@ -473,9 +519,12 @@ function wireDay(day, date) {
 		renderDay(); renderFooter();
 	};
 	el("add-ex").onclick = async () => {
-		const v = await twoFieldModal("Add an exercise", "What is it?", "Why? (optional)");
-		if (!v || !v[0].trim()) return;
-		entries.push({ id: uid(), ts: new Date().toISOString(), person, date, synced: false, type: "add", day: day.key, exName: v[0].trim(), note: v[1].trim() });
+		const v = await addExerciseModal();
+		if (!v || !v.name.trim()) return;
+		entries.push({
+			id: uid(), ts: new Date().toISOString(), person, date, synced: false, type: "add",
+			day: day.key, exName: v.name.trim(), note: v.why.trim(), tags: v.tags, reps: v.reps
+		});
 		save(); renderDay(); renderFooter();
 	};
 	document.querySelectorAll("[data-sess]").forEach(b => {
@@ -534,35 +583,66 @@ el("modal-backdrop").addEventListener("click", e => { if (e.target.id === "modal
 
 function rpeModal(exId, exName, set, dayKey, date) {
 	const vals = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
-	// prefill weight: this set's logged weight, else the latest weight on this exercise today
+	const def = (weekDef().days.flatMap(d => d.exercises).find(e => e.id === exId)) || {};
 	const existing = findEntry({ type: "set", person, date, ex: exId, set });
-	let pre = existing && existing.weight != null ? existing.weight : "";
-	if (pre === "") {
+
+	// weight: this set's own, else carry the last weight logged on it today
+	let preW = existing && existing.weight != null ? existing.weight : "";
+	if (preW === "") {
 		const prior = entries.filter(e => e.type === "set" && e.person === person && e.date === date && e.ex === exId && e.weight != null);
-		if (prior.length) pre = prior[prior.length - 1].weight;
+		if (prior.length) preW = prior[prior.length - 1].weight;
 	}
+	// reps: assume the prescription was hit — only a miss needs typing
+	const rxReps = perPerson(def.reps, person);
+	const preR = existing && existing.reps != null ? existing.reps : (rxReps != null ? rxReps : "");
+	const repsField = def.timed ? "" : `
+		<div class="field">
+			<div class="modal-sub">Reps${def.amrap ? " (AMRAP — enter it)" : rxReps != null ? " — prescribed " + rxReps : ""}</div>
+			<input class="modal-input" id="m-reps" type="number" inputmode="numeric" step="1" min="0" placeholder="${def.amrap ? "e.g. 9" : "reps"}" value="${preR}">
+		</div>`;
+
 	openModal(`
 		<div class="modal-title">${esc(exName)} — set ${set}</div>
-		<div class="modal-sub">Weight used (lb) — optional</div>
-		<input class="modal-input" id="m-weight" type="number" inputmode="decimal" step="2.5" min="0" placeholder="e.g. 185" value="${pre}">
-		<div class="modal-sub">How hard was it? (RPE) — tapping saves both</div>
+		<div class="field-row">
+			<div class="field">
+				<div class="modal-sub">Weight (lb)</div>
+				<input class="modal-input" id="m-weight" type="number" inputmode="decimal" step="2.5" min="0" placeholder="e.g. 185" value="${preW}">
+			</div>
+			${repsField}
+		</div>
+		<div class="modal-sub">How hard was it? (RPE) — tapping saves all of it</div>
 		<div class="rpe-grid">
 			${vals.map(v => `<button class="rpe-btn ${v >= 7 && v <= 8 ? "in-window" : ""}" data-rpe="${v}">${v}</button>`).join("")}
 			<button class="rpe-btn" data-rpe="5">≤5</button>
+			<button class="rpe-btn wide danger" id="m-skip-set">skip this set</button>
 			<button class="rpe-btn wide" data-rpe="clear">clear this set</button>
 		</div>`);
+
 	el("modal").querySelectorAll("[data-rpe]").forEach(b => {
 		b.onclick = () => {
 			const clear = b.dataset.rpe === "clear";
 			const wv = parseFloat(el("m-weight").value);
+			const rvEl = el("m-reps");
+			const rv = rvEl ? parseInt(rvEl.value, 10) : NaN;
 			upsert({ type: "set", person, date, ex: exId, set }, {
 				exName, day: dayKey,
 				rpe: clear ? null : Number(b.dataset.rpe),
-				weight: clear || isNaN(wv) ? null : wv
+				weight: clear || isNaN(wv) ? null : wv,
+				reps: clear || isNaN(rv) ? null : rv,
+				skipped: false, note: clear ? null : (existing ? existing.note : null)
 			});
 			closeModal(); renderDay(); renderFooter();
 		};
 	});
+	el("m-skip-set").onclick = async () => {
+		closeModal();
+		const why = await noteModal("Skipping set " + set + " of " + exName + " — why? (optional)", "");
+		if (why === null) return;
+		upsert({ type: "set", person, date, ex: exId, set }, {
+			exName, day: dayKey, skipped: true, rpe: null, weight: null, reps: null, note: why
+		});
+		renderDay(); renderFooter();
+	};
 }
 
 function noteModal(title, existing) {
@@ -577,6 +657,56 @@ function noteModal(title, existing) {
 		el("m-cancel").onclick = () => { closeModal(); resolve(null); };
 		el("m-save").onclick = () => { const v = el("m-text").value; closeModal(); resolve(v); };
 		el("m-text").focus();
+	});
+}
+
+/* Muscle tags on an ad-hoc addition, so it lands in the volume graphs instead
+   of waiting for the next check-in to be classified. Optional — untagged
+   additions still log fine, they just don't count toward a muscle. */
+const MUSCLES = ["chest", "front delt", "triceps", "lats", "upper back", "biceps", "quads", "hams", "glutes", "core"];
+
+function addExerciseModal() {
+	return new Promise(resolve => {
+		openModal(`
+			<div class="modal-title">Add an exercise</div>
+			<input class="modal-input" id="m-f1" placeholder="What is it?">
+			<div class="field-row">
+				<div class="field">
+					<div class="modal-sub">Sets</div>
+					<input class="modal-input" id="m-sets" type="number" inputmode="numeric" min="1" max="12" value="3">
+				</div>
+				<div class="field">
+					<div class="modal-sub">Target reps</div>
+					<input class="modal-input" id="m-arep" type="number" inputmode="numeric" min="1" placeholder="10">
+				</div>
+			</div>
+			<div class="modal-sub">Muscles it trains (optional)</div>
+			<div class="tag-pick">${MUSCLES.map(m => `<button class="chip" data-tag="${m}">${m}</button>`).join("")}</div>
+			<textarea class="modal-input" id="m-f2" rows="2" placeholder="Why? (optional)"></textarea>
+			<div class="modal-row">
+				<button class="modal-btn" id="m-cancel">Cancel</button>
+				<button class="modal-btn primary" id="m-save">Add</button>
+			</div>`);
+		const picked = new Set();
+		el("modal").querySelectorAll("[data-tag]").forEach(b => {
+			b.onclick = () => {
+				const t = b.dataset.tag;
+				if (picked.has(t)) { picked.delete(t); b.classList.remove("on"); }
+				else { picked.add(t); b.classList.add("on"); }
+			};
+		});
+		el("m-cancel").onclick = () => { closeModal(); resolve(null); };
+		el("m-save").onclick = () => {
+			const reps = parseInt(el("m-arep").value, 10);
+			const sets = parseInt(el("m-sets").value, 10);
+			const out = {
+				name: el("m-f1").value, why: el("m-f2").value,
+				tags: [...picked], reps: isNaN(reps) ? null : reps,
+				sets: isNaN(sets) ? 3 : Math.min(12, Math.max(1, sets))
+			};
+			closeModal(); resolve(out);
+		};
+		el("m-f1").focus();
 	});
 }
 
@@ -704,6 +834,10 @@ document.querySelectorAll(".person-btn").forEach(b => {
 		localStorage.setItem(LS_PERSON, person);
 		renderAll();
 	};
+});
+
+document.querySelectorAll(".view-tab").forEach(b => {
+	b.onclick = () => { view = b.dataset.view; renderAll(); };
 });
 
 /* ---------- boot ---------- */
