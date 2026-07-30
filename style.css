@@ -56,6 +56,11 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 .scale-btn.sel { background: var(--accent); color: #12101f; }
 
+.sleep-label { margin-top: 10px !important; }
+.sleep-row { display: flex; gap: 8px; }
+.sleep-row input { flex: 1; margin-bottom: 0; }
+.sleep-row button { flex: 0 0 auto; padding: 10px 18px; }
+
 /* day header */
 .day-head { display: flex; align-items: baseline; justify-content: space-between; margin: 6px 2px 10px; }
 .day-title { font-size: 19px; font-weight: 800; }
@@ -72,6 +77,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .ex-name .note-btn.has-note { color: var(--accent); }
 .rx-line { font-size: 13px; color: var(--dim); margin-top: 3px; }
 .rx-line b { color: var(--ink); font-weight: 600; }
+.rx-line.mine { margin-top: 5px; }
+.rx-line.mine b { font-size: 19px; font-weight: 700; }
 .rx-tag { font-weight: 800; font-size: 11px; margin-right: 4px; }
 .rx-tag.sam { color: var(--sam); }
 .rx-tag.manny { color: var(--manny); }

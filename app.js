@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.0";
+const APP_VERSION = "v1.1";
 
 let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
@@ -123,6 +123,7 @@ function renderCheckin() {
 	const ci = (prog.checkins || []).find(c => c.person === person);
 	if (!ci) { slot.innerHTML = ""; return; }
 	const rec = findEntry({ type: "checkin", person, date: todayStr(), ex: ci.id });
+	const sleep = findEntry({ type: "sleep", person, date: todayStr() });
 	const noteBtn = `<button class="note-btn ${rec && rec.note ? "has-note" : ""}" data-ci-note="${ci.id}">✎</button>`;
 	slot.innerHTML = `
 		<div class="card checkin">
@@ -132,6 +133,11 @@ function renderCheckin() {
 				`<button class="scale-btn ${rec && rec.rating === n ? "sel" : ""}" data-ci="${ci.id}" data-val="${n}">${n}</button>`
 			).join("")}</div>
 			${rec && rec.note ? `<div class="note-view">“${esc(rec.note)}”</div>` : ""}
+			<div class="ci-hint sleep-label">Sleep — hours in bed last night</div>
+			<div class="sleep-row">
+				<input class="modal-input" id="sleep-input" type="number" step="0.5" min="0" max="24" inputmode="decimal" placeholder="7.5" value="${sleep && sleep.hours != null ? sleep.hours : ""}">
+				<button class="modal-btn primary" id="sleep-save">${sleep && sleep.hours != null ? "update" : "save"}</button>
+			</div>
 		</div>`;
 	slot.querySelectorAll("[data-ci]").forEach(b => {
 		b.onclick = () => {
@@ -139,6 +145,13 @@ function renderCheckin() {
 			renderCheckin(); renderFooter();
 		};
 	});
+	el("sleep-save").onclick = () => {
+		const v = parseFloat(el("sleep-input").value);
+		if (isNaN(v) || v < 0 || v > 24) { toast("Enter hours, e.g. 7.5", true); return; }
+		upsert({ type: "sleep", person, date: todayStr() }, { hours: v });
+		renderCheckin(); renderFooter();
+		toast("Sleep logged: " + v + " hrs");
+	};
 	const nb = slot.querySelector("[data-ci-note]");
 	if (nb) nb.onclick = async () => {
 		const v = await noteModal(ci.label + " — note", rec && rec.note);
@@ -151,10 +164,13 @@ function renderCheckin() {
 function rxLines(ex) {
 	if (typeof ex.rx === "string") {
 		const tag = ex.for !== "both" ? `<span class="rx-tag ${ex.for}">${ex.for.toUpperCase()}</span>` : "";
-		return `<div class="rx-line">${tag}<b>${esc(ex.rx)}</b></div>`;
+		const mine = ex.for === "both" || ex.for === person;
+		return `<div class="rx-line ${mine ? "mine" : ""}">${tag}<b>${esc(ex.rx)}</b></div>`;
 	}
-	return prog.people.map(p =>
-		`<div class="rx-line"><span class="rx-tag ${p}">${p.toUpperCase()}</span><b>${esc(ex.rx[p])}</b></div>`
+	// active person first, and bigger
+	const order = [person, ...prog.people.filter(p => p !== person)];
+	return order.map(p =>
+		`<div class="rx-line ${p === person ? "mine" : ""}"><span class="rx-tag ${p}">${p.toUpperCase()}</span><b>${esc(ex.rx[p])}</b></div>`
 	).join("");
 }
 
@@ -228,7 +244,7 @@ function exerciseCard(ex, date, dayKey) {
 }
 
 const FEELS = [
-	{ field: "pain", label: "PAIN", opts: [["none", "sel-good"], ["mild", "sel-warn"], ["real", "sel-bad"]] },
+	{ field: "pain", label: "PAIN", opts: [["none", "sel-good"], ["discomfort", "sel-warn"], ["≥3", "sel-bad"]] },
 	{ field: "weight", label: "WT", opts: [["easy", "sel-warn"], ["right", "sel-good"], ["heavy", "sel-bad"]] },
 	{ field: "volume", label: "VOL", opts: [["easy", "sel-warn"], ["right", "sel-good"], ["heavy", "sel-bad"]] }
 ];
