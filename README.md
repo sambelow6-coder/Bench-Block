@@ -8,10 +8,14 @@ intelligence stays in the weekly Claude conversation.
 - **Coach → lifters:** `program.json` in this repo IS the program. Weekly
   update = Claude edits it, bumps `program_version`, commits, pushes. The app
   is network-first, so both phones show the new week on next open.
-- **Lifters → coach:** every tap in the app becomes an entry in localStorage.
-  "Send to Coach" bundles unsynced entries into `coachlog_<person>_<stamp>.json`
-  and opens the share sheet → save to `OneDrive/WorkoutCoach/logs/`.
-  Claude reads that folder from Sam's PC at the start of each weekly session.
+- **Lifters → coach:** every tap becomes an entry in localStorage. "Send to
+  Coach" POSTs the unsynced ones to a Google Form Sam owns (one tap, no
+  sign-in, no share sheet); the Form appends them to its response Sheet in
+  Sam's Drive, which Claude reads at check-in via the Drive connector.
+  Payloads over ~30k chars split into parts sharing one `batch` id.
+  Fire-and-forget: a cross-origin form POST is opaque, so the app cannot
+  confirm receipt — hence "resend everything" (duplicates are harmless, see
+  dedup rules) and "save a file instead" as a manual escape hatch.
 
 ## Data rules (consumer = Claude)
 - Latest record per `(person, date, type, ex, set/field)` wins.
@@ -23,8 +27,9 @@ intelligence stays in the weekly Claude conversation.
 
 ## Hosting
 GitHub Pages, public repo (the site holds no personal data beyond first names
-and prescribed weights — logs never touch the repo). One-time setup: install
-GitHub CLI, `gh auth login`, then Claude handles repo/pages/pushes.
+and prescribed weights — logs never touch the repo). Live at
+https://sambelow6-coder.github.io/Bench-Block/ . Claude pushes updates from
+Sam's PC; Pages redeploys itself and both phones update on next open.
 
 ## Files
 - `program.json` — the current program (single source of truth, coach-written)

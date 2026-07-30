@@ -1,15 +1,23 @@
 /* Bench Block — dumb terminal for the coach loop.
    All entries are append/replace records in localStorage; "Send to Coach"
-   ships everything unsynced as a single JSON file via the share sheet
-   (OneDrive → WorkoutCoach/logs) or a download. The program itself is
-   read-only here: it ships with the site as program.json. */
+   posts them to a Google Form Sam owns, whose responses land in a Sheet in
+   his Drive that Claude reads at check-in. The program itself is read-only
+   here: it ships with the site as program.json. */
 
 "use strict";
 
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.4";
+const APP_VERSION = "v1.6";
+
+/* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
+   browser cannot read a success response. Hence no-cors, "resend everything"
+   as the safety net, and dedup on the reading end — latest ts per logical
+   fact wins, so duplicate rows are harmless. */
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSd76kw58-fu-5CqhWPLMrgkE722sbdrZxnKqRsPxVINx-AIWQ/formResponse";
+const FORM_FIELD = "entry.1121346272";
+const CHUNK_CHARS = 30000;
 
 let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
@@ -508,37 +516,93 @@ function renderFooter() {
 	el("version-tag").textContent = APP_VERSION + " · program v" + (prog ? prog.program_version : "?");
 }
 
+function batchId() { return person + "-" + Date.now().toString(36); }
+
+/* Greedy split so no single form answer exceeds the field limit. Months of
+   "resend everything" would blow one answer; parts are re-stitched by batch. */
+function chunkEntries(batch) {
+	const chunks = [];
+	let cur = [];
+	for (const e of batch) {
+		cur.push(e);
+		if (JSON.stringify(cur).length > CHUNK_CHARS) {
+			if (cur.length === 1) { chunks.push(cur); cur = []; }
+			else { const last = cur.pop(); chunks.push(cur); cur = [last]; }
+		}
+	}
+	if (cur.length) chunks.push(cur);
+	return chunks;
+}
+
+function payloadFor(chunk, id, part, parts) {
+	return JSON.stringify({
+		app: "bench-block", format: 2, batch: id, part, parts,
+		exported_at: new Date().toISOString(), exported_by: person,
+		app_version: APP_VERSION, program_version: prog ? prog.program_version : null,
+		note_to_coach: "Latest record per (person,date,type,ex,set/field) wins; rpe/value null = cleared; retracted:true undoes a skip/add.",
+		entries: chunk
+	});
+}
+
+async function postToForm(text) {
+	const fd = new FormData();
+	fd.append(FORM_FIELD, text);
+	// opaque response: resolves on delivery, throws only on network failure
+	await fetch(FORM_ACTION, { method: "POST", mode: "no-cors", body: fd });
+}
+
 async function sendToCoach(all) {
 	const batch = entries.filter(e => all || !e.synced);
 	if (!batch.length) { toast("Nothing to send"); return; }
-	const stamp = todayStr().replace(/-/g, "") + "_" + new Date().toTimeString().slice(0, 5).replace(":", "");
-	const fname = `coachlog_${person}_${stamp}.json`;
-	const payload = {
-		app: "bench-block", format: 1, exported_at: new Date().toISOString(),
-		exported_by: person, program_version: prog ? prog.program_version : null,
-		note_to_coach: "Latest record per (person,date,type,ex,set/field) wins; rpe/value null = cleared.",
-		entries: batch
-	};
-	const file = new File([JSON.stringify(payload, null, 1)], fname, { type: "application/json" });
-	let shared = false;
-	if (navigator.canShare && navigator.canShare({ files: [file] })) {
-		try { await navigator.share({ files: [file], title: fname }); shared = true; }
-		catch (e) { if (e.name === "AbortError") return; }
-	}
-	if (!shared) {
-		const a = document.createElement("a");
-		a.href = URL.createObjectURL(file);
-		a.download = fname;
-		a.click();
-		setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+	if (navigator.onLine === false) { toast("Offline — try again on data/wifi", true); return; }
+
+	const btn = el("send-btn");
+	btn.disabled = true;
+	const label = btn.firstChild;
+	const wasText = label.textContent;
+	label.textContent = "Sending… ";
+
+	const chunks = chunkEntries(batch);
+	const id = batchId();
+	try {
+		for (let i = 0; i < chunks.length; i++) {
+			await postToForm(payloadFor(chunks[i], id, i + 1, chunks.length));
+		}
+	} catch (e) {
+		label.textContent = wasText;
+		renderFooter();
+		toast("Send failed — check signal, then retry", true);
+		return;
 	}
 	batch.forEach(e => e.synced = true);
-	save(); renderFooter();
-	toast(batch.length + " entries sent — drop in WorkoutCoach/logs");
+	save();
+	label.textContent = wasText;
+	renderFooter();
+	toast("Sent " + batch.length + " to coach ✓");
+}
+
+/* Manual escape hatch: hands the same JSON to the share sheet, for the day
+   Forms is down or a send silently vanished. */
+async function saveAsFile() {
+	const batch = entries.length ? entries : [];
+	if (!batch.length) { toast("Nothing logged yet"); return; }
+	const stamp = todayStr().replace(/-/g, "") + "_" + new Date().toTimeString().slice(0, 5).replace(":", "");
+	const fname = `coachlog_${person}_${stamp}.json`;
+	const file = new File([payloadFor(batch, batchId(), 1, 1)], fname, { type: "application/json" });
+	if (navigator.canShare && navigator.canShare({ files: [file] })) {
+		try { await navigator.share({ files: [file], title: fname }); return; }
+		catch (e) { if (e.name === "AbortError") return; }
+	}
+	const a = document.createElement("a");
+	a.href = URL.createObjectURL(file);
+	a.download = fname;
+	a.click();
+	setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 }
 
 el("send-btn").onclick = () => sendToCoach(false);
 el("resend-all").onclick = () => sendToCoach(true);
+el("save-file").onclick = saveAsFile;
 
 /* ---------- person toggle ---------- */
 
