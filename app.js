@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.6";
+const APP_VERSION = "v1.7";
 
 /* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
    browser cannot read a success response. Hence no-cors, "resend everything"
@@ -18,6 +18,11 @@ const APP_VERSION = "v1.6";
 const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSd76kw58-fu-5CqhWPLMrgkE722sbdrZxnKqRsPxVINx-AIWQ/formResponse";
 const FORM_FIELD = "entry.1121346272";
 const CHUNK_CHARS = 30000;
+
+/* Read-back: the same response Sheet, fetched as CSV, is the shared log. Both
+   lifters' entries merge into every device, so the sheet — not any one phone —
+   is the durable store. Needs the sheet set to "anyone with the link can view". */
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1SPE64Lt0Z-xZrLL5ow1373zmslKS_PtFD_LBVCggNgk/gviz/tq?tqx=out:csv";
 
 let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
@@ -81,6 +86,90 @@ function upsert(match, data) {
 	return e;
 }
 function pendingCount() { return entries.filter(e => !e.synced).length; }
+
+/* One logical fact = one key, matching the upsert match-objects above. Used to
+   merge the shared sheet into this device without duplicating anything. */
+function keyOf(e) {
+	switch (e.type) {
+		case "add": return "add|" + e.id;
+		case "set": return ["set", e.person, e.date, e.ex, e.set].join("|");
+		case "feel": return ["feel", e.person, e.date, e.ex, e.field].join("|");
+		case "sleep": return ["sleep", e.person, e.date].join("|");
+		case "session": return ["session", e.person, e.date, e.day].join("|");
+		case "skip": return ["skip", e.person, e.date, e.day].join("|");
+		default: return [e.type, e.person, e.date, e.ex].join("|");
+	}
+}
+
+/* RFC-4180-ish: payload cells are JSON, so quotes and newlines inside cells
+   are real and must survive. */
+function parseCsv(text) {
+	const rows = [];
+	let row = [], cell = "", inQ = false;
+	for (let i = 0; i < text.length; i++) {
+		const c = text[i];
+		if (inQ) {
+			if (c === '"') {
+				if (text[i + 1] === '"') { cell += '"'; i++; }
+				else inQ = false;
+			} else cell += c;
+		} else if (c === '"') inQ = true;
+		else if (c === ",") { row.push(cell); cell = ""; }
+		else if (c === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+		else if (c !== "\r") cell += c;
+	}
+	if (cell.length || row.length) { row.push(cell); rows.push(row); }
+	return rows;
+}
+
+function mergeRemote(remote) {
+	const byKey = new Map();
+	for (const e of entries) byKey.set(keyOf(e), e);
+	let changed = 0;
+	for (const r of remote) {
+		if (!r || !r.type) continue;
+		const k = keyOf(r);
+		const mine = byKey.get(k);
+		if (!mine) {
+			const copy = Object.assign({}, r, { synced: true });
+			entries.push(copy); byKey.set(k, copy); changed++;
+		} else if (!mine.synced) {
+			// an un-sent local edit is the newest thing this device knows; it wins
+			// here and wins in the sheet too once it sends (latest ts per fact)
+			continue;
+		} else if ((r.ts || "") > (mine.ts || "")) {
+			Object.assign(mine, r, { synced: true }); changed++;
+		}
+	}
+	if (changed) save();
+	return changed;
+}
+
+async function pullShared(manual) {
+	if (navigator.onLine === false) { if (manual) toast("Offline — can't refresh", true); return; }
+	let text;
+	try {
+		const r = await fetch(SHEET_CSV + "&_=" + Date.now(), { cache: "no-store" });
+		if (!r.ok) throw new Error("http " + r.status);
+		text = await r.text();
+	} catch (e) {
+		if (manual) toast("Couldn't reach the shared log", true);
+		return;
+	}
+	const remote = [];
+	for (const row of parseCsv(text)) {
+		const cell = row[row.length - 1];
+		if (!cell || cell.indexOf('"entries"') === -1) continue;
+		try {
+			const p = JSON.parse(cell);
+			if (Array.isArray(p.entries)) remote.push(...p.entries);
+		} catch (e) { /* a row we can't read is a row we ignore */ }
+	}
+	const changed = mergeRemote(remote);
+	if (changed) renderAll();
+	else renderFooter();
+	if (manual) toast(changed ? "Pulled " + changed + " from the shared log" : "Already up to date");
+}
 
 /* ---------- program ---------- */
 
@@ -579,6 +668,8 @@ async function sendToCoach(all) {
 	label.textContent = wasText;
 	renderFooter();
 	toast("Sent " + batch.length + " to coach ✓");
+	// pick up whatever the other lifter sent while we were logging
+	setTimeout(() => pullShared(false), 3000);
 }
 
 /* Manual escape hatch: hands the same JSON to the share sheet, for the day
@@ -603,6 +694,7 @@ async function saveAsFile() {
 el("send-btn").onclick = () => sendToCoach(false);
 el("resend-all").onclick = () => sendToCoach(true);
 el("save-file").onclick = saveAsFile;
+el("pull-now").onclick = () => pullShared(true);
 
 /* ---------- person toggle ---------- */
 
@@ -617,4 +709,8 @@ document.querySelectorAll(".person-btn").forEach(b => {
 /* ---------- boot ---------- */
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
-loadProgram();
+loadProgram().then(() => pullShared(false));
+// coming back to a backgrounded app is the other moment the shared log may have moved
+document.addEventListener("visibilitychange", () => {
+	if (document.visibilityState === "visible" && prog) pullShared(false);
+});
