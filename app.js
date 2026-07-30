@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.9";
+const APP_VERSION = "v2.0";
 
 /* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
    browser cannot read a success response. Hence no-cors, "resend everything"
@@ -278,7 +278,7 @@ function renderCheckin() {
 				<input class="modal-input" id="sleep-input" type="number" step="0.5" min="0" max="24" inputmode="decimal" placeholder="7.5" value="${sleep && sleep.hours != null ? sleep.hours : ""}">
 				<button class="modal-btn primary" id="sleep-save">${sleep && sleep.hours != null ? "update" : "save"}</button>
 			</div>
-			<div class="ci-hint sleep-label">Bodyweight (lb) — weekly is plenty</div>
+			<div class="ci-hint sleep-label">Bodyweight (lb) — if you have it</div>
 			<div class="sleep-row">
 				<input class="modal-input" id="bw-input" type="number" step="0.2" min="0" max="600" inputmode="decimal" placeholder="185" value="${bw && bw.lb != null ? bw.lb : ""}">
 				<button class="modal-btn primary" id="bw-save">${bw && bw.lb != null ? "update" : "save"}</button>

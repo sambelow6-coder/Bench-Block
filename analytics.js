@@ -88,7 +88,7 @@ function liftsAvailable(person) {
    design (heavy day always outranks the moderate day), which reads as noise
    rather than progress, so the week's best set is the honest signal. */
 function e1rmWeekly(person, lift) {
-	const weeks = weeksWithData(person);
+	const weeks = axisWeeks(person);
 	const best = new Map();
 	for (const d of doneSets(person)) {
 		if (d.lift !== lift || d.weight == null || d.reps == null) continue;
@@ -118,16 +118,27 @@ function weeksWithData(person) {
 	return [...s].sort();
 }
 
+/* Weeks to lay out along the x-axis. Before anything is logged, the block's own
+   weeks stand in, so a chart with no data still shows the shape it will fill. */
+function axisWeeks(person) {
+	const have = weeksWithData(person);
+	if (have.length) return have;
+	return prog ? prog.weeks.map(w => weekStart(w.week_of)) : [];
+}
+
 /* Weekly tonnage + hard sets for one lift, alongside that week's best e1RM —
    the "is more volume buying anything" view. */
 function weeklyLiftLoad(person, lift) {
-	const weeks = weeksWithData(person);
-	const rows = weeks.map(w => ({ week: w, tonnage: 0, hardSets: 0, best: null }));
+	const weeks = axisWeeks(person);
+	const rows = weeks.map(w => ({ week: w, tonnage: 0, hardSets: 0, best: null, noWeight: 0 }));
 	const idx = new Map(rows.map((r, i) => [r.week, i]));
 	for (const d of doneSets(person)) {
 		if (d.lift !== lift) continue;
 		const i = idx.get(weekStart(d.date));
 		if (i == null) continue;
+		// a set logged without a weight contributes nothing rather than a zero;
+		// the count is surfaced so an incomplete total never passes as complete
+		if (d.weight == null) rows[i].noWeight++;
 		rows[i].tonnage += d.tonnage;
 		if (d.rpe >= HARD_RPE) rows[i].hardSets++;
 		const v = e1rm(d.weight, d.reps, d.rpe);
@@ -139,7 +150,7 @@ function weeklyLiftLoad(person, lift) {
 /* RPE drift: same prescribed percentage, week over week. Falling = getting
    stronger; climbing = fatigue outrunning recovery (the deload alarm). */
 function rpeDrift(person, lift) {
-	const weeks = weeksWithData(person);
+	const weeks = axisWeeks(person);
 	const pcts = new Map();
 	for (const d of doneSets(person)) {
 		if (d.lift !== lift || !d.pct) continue;
@@ -190,7 +201,7 @@ function checkinSeries(person, id) {
    exercise trains — standard practice, so totals across muscles exceed total
    sets on purpose. */
 function weeklyMuscleSets(person) {
-	const weeks = weeksWithData(person);
+	const weeks = axisWeeks(person);
 	const muscles = new Map();
 	for (const d of doneSets(person)) {
 		if (d.rpe < HARD_RPE) continue;
@@ -210,7 +221,7 @@ function weeklyMuscleSets(person) {
 
 /* Weekly averages: hours in bed vs how the sessions actually felt. */
 function weeklySleepQuality(person) {
-	const weeks = weeksWithData(person);
+	const weeks = axisWeeks(person);
 	const sleep = new Map(), qual = new Map();
 	const push = (m, k, v) => { if (!m.has(k)) m.set(k, []); m.get(k).push(v); };
 	for (const e of entries) {
@@ -233,7 +244,7 @@ function bodyweightSeries(person) {
 
 /* Prescribed vs completed, plus why anything was missed. */
 function adherence(person) {
-	const weeks = weeksWithData(person);
+	const weeks = axisWeeks(person);
 	const rows = weeks.map(w => ({ week: w, prescribed: 0, done: 0, skippedSets: 0, skippedDays: 0, reasons: [] }));
 	const idx = new Map(rows.map((r, i) => [r.week, i]));
 

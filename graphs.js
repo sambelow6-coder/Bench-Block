@@ -3,15 +3,21 @@
 
 "use strict";
 
-const CH = { w: 340, h: 208, l: 46, r: 12, t: 14, b: 46 };
+const CH = { w: 340, h: 222, l: 54, r: 14, t: 16, b: 52 };
 
 function chartFrame(inner, note) {
 	return `<svg viewBox="0 0 ${CH.w} ${CH.h}" class="chart" role="img">${inner}</svg>`
 		+ (note ? `<div class="chart-note">${note}</div>` : "");
 }
 
-function emptyState(msg) {
-	return `<div class="chart-empty">${esc(msg || "nothing logged for this yet")}</div>`;
+/* An empty chart is still a chart: same frame, same axis captions, same week
+   columns — just no series, and no invented y-values pretending to be a scale. */
+function emptyFrame(xLabels, opts) {
+	let g = axes({ lo: 0, hi: 1 }, xLabels || [], opts.everyNth, true) + axisLabels(opts.yLabel, opts.xLabel);
+	const cx = CH.l + (CH.w - CH.l - CH.r) / 2;
+	const cy = CH.t + (CH.h - CH.t - CH.b) / 2;
+	g += `<text class="nodata" x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle">no data yet</text>`;
+	return chartFrame(g, opts.emptyMsg);
 }
 
 /* Axis captions. Without these a reader has to guess what the numbers are. */
@@ -46,7 +52,7 @@ function xPix(i, n) {
 	return CH.l + (CH.w - CH.l - CH.r) * (i / (n - 1));
 }
 
-function axes(sc, xLabels, everyNth) {
+function axes(sc, xLabels, everyNth, noYNums) {
 	const plotB = CH.h - CH.b;
 	let g = `<line class="ax" x1="${CH.l}" y1="${CH.t}" x2="${CH.l}" y2="${plotB}"/>
 		<line class="ax" x1="${CH.l}" y1="${plotB}" x2="${CH.w - CH.r}" y2="${plotB}"/>`;
@@ -54,13 +60,13 @@ function axes(sc, xLabels, everyNth) {
 	for (let i = 0; i <= ticks; i++) {
 		const v = sc.lo + (sc.hi - sc.lo) * (i / ticks);
 		const y = yPix(v, sc);
-		g += `<line class="grid" x1="${CH.l}" y1="${y.toFixed(1)}" x2="${CH.w - CH.r}" y2="${y.toFixed(1)}"/>
-			<text class="tick" x="${CH.l - 4}" y="${(y + 3).toFixed(1)}" text-anchor="end">${fmtTick(v)}</text>`;
+		g += `<line class="grid" x1="${CH.l}" y1="${y.toFixed(1)}" x2="${CH.w - CH.r}" y2="${y.toFixed(1)}"/>`;
+		if (!noYNums) g += `<text class="tick" x="${CH.l - 6}" y="${(y + 3.4).toFixed(1)}" text-anchor="end">${fmtTick(v)}</text>`;
 	}
 	const step = everyNth || Math.ceil(xLabels.length / 6) || 1;
 	xLabels.forEach((lb, i) => {
 		if (i % step) return;
-		g += `<text class="tick" x="${xPix(i, xLabels.length).toFixed(1)}" y="${plotB + 13}" text-anchor="middle">${esc(lb)}</text>`;
+		g += `<text class="tick" x="${xPix(i, xLabels.length).toFixed(1)}" y="${plotB + 15}" text-anchor="middle">${esc(lb)}</text>`;
 	});
 	return g;
 }
@@ -80,7 +86,7 @@ function lineChart(series, xLabels, opts) {
 	opts = opts || {};
 	const all = series.flatMap(s => s.pts.map(p => p.y));
 	const sc = scaleY(all, opts.zeroBase);
-	if (!sc || !all.some(v => v != null && isFinite(v))) return emptyState(opts.emptyMsg);
+	if (!sc || !all.some(v => v != null && isFinite(v))) return emptyFrame(xLabels, opts);
 	let g = axes(sc, xLabels, opts.everyNth) + axisLabels(opts.yLabel, opts.xLabel);
 	series.forEach((s, si) => {
 		const cls = s.cls || ("c" + (si % 6 + 1));
@@ -114,7 +120,7 @@ function comboChart(groups, bars, line, opts) {
 	opts = opts || {};
 	const barVals = groups.flatMap(g => g.values.filter(v => v != null));
 	const lineVals = line ? line.pts.map(p => p.y).filter(v => v != null) : [];
-	if (!barVals.some(v => v !== 0) && !lineVals.length) return emptyState(opts.emptyMsg);
+	if (!barVals.some(v => v !== 0) && !lineVals.length) return emptyFrame(groups.map(x => x.label), opts);
 	const bsc = scaleY(barVals.length ? barVals : [0], true);
 	let g = axes(bsc, groups.map(x => x.label), opts.everyNth) + axisLabels(opts.yLabel, opts.xLabel);
 	const plotB = CH.h - CH.b;
@@ -150,7 +156,7 @@ function comboChart(groups, bars, line, opts) {
 
 function scatterChart(pts, opts) {
 	opts = opts || {};
-	if (!pts.length) return emptyState(opts.emptyMsg);
+	if (!pts.length) return emptyFrame([], opts);
 	const ysc = scaleY(pts.map(p => p.y), true);
 	const xs = pts.map(p => p.x);
 	let xlo = 0, xhi = Math.max(...xs, 1);
@@ -191,14 +197,13 @@ function renderGraphs() {
 	const host = el("day-card");
 	el("checkin-slot").innerHTML = "";
 	const sets = doneSets(person);
-	if (!sets.length) {
-		host.innerHTML = `<div class="card">Nothing logged yet for ${person}. Graphs appear as soon as there are sets in the log — they read the same shared history the coach does.</div>`;
-		return;
-	}
-
 	const lifts = liftsAvailable(person);
+	// every card renders in every state; an empty one shows its own frame and
+	// says what would fill it, rather than the page hiding itself
 	if (!graphLift || !lifts.includes(graphLift)) graphLift = lifts.includes("bench") ? "bench" : lifts[0];
-	let html = "";
+	let html = sets.length ? "" :
+		`<div class="card chart-note">Nothing logged for ${esc(person)} yet — every chart below is waiting on data and says what would fill it.</div>`;
+	if (!graphLift || !lifts.includes(graphLift)) graphLift = lifts.includes("bench") ? "bench" : lifts[0];
 
 	// 1. estimated 1RM — the progress line
 	if (lifts.length) {
@@ -218,12 +223,17 @@ function renderGraphs() {
 	// 2. volume against progress: tonnage and hard sets keep their own axes
 	// rather than being fudged onto one
 	const load = weeklyLiftLoad(person, graphLift);
+	const noWeight = load.reduce((s, r) => s + r.noWeight, 0);
 	html += card("Volume vs progress — " + (graphLift || "—"), "is more work actually buying strength?",
 		comboChart(
 			load.map(r => ({ label: shortDate(r.week), values: [r.tonnage] })),
 			[{ cls: "c2" }],
 			{ pts: load.map(r => ({ y: r.best })), cls: "c1" },
-			{ yLabel: "tonnage (lb)", xLabel: "week beginning", emptyMsg: "no weights logged for " + (graphLift || "this lift") + " yet" }
+			{
+				yLabel: "tonnage (lb)", xLabel: "week beginning",
+				emptyMsg: "no weights logged for " + (graphLift || "this lift") + " yet",
+				note: noWeight ? noWeight + " logged set" + (noWeight > 1 ? "s" : "") + " had no weight entered, so they add nothing to the tonnage rather than counting as zero" : null
+			}
 		) + legend([{ cls: "c2", label: "weekly tonnage — weight × reps, all sets" }, { cls: "c1", label: "best e1RM that week" }])
 		+ `<div class="graph-sub sub-head">Hard sets per week — sets taken at RPE 7 or above</div>`
 		+ comboChart(load.map(r => ({ label: shortDate(r.week), values: [r.hardSets] })), [{ cls: "c3" }], null,
@@ -231,17 +241,16 @@ function renderGraphs() {
 
 	// 3. RPE drift at fixed %
 	const drift = rpeDrift(person, graphLift);
-	if (drift.length) {
-		const weeks = drift[0].pts.map(p => shortDate(p.x));
-		html += card("RPE drift at fixed %", "the same prescribed load, week over week · falling = getting stronger, climbing = time to deload",
-			lineChart(drift.map((d, i) => ({ pts: d.pts, cls: "c" + (i % 6 + 1) })), weeks,
-				{ yLabel: "average RPE", xLabel: "week beginning", emptyMsg: "needs two weeks at the same prescribed %" })
-			+ legend(drift.map((d, i) => ({ cls: "c" + (i % 6 + 1), label: d.pct + "% of max" }))));
-	}
+	const wkLabels = axisWeeks(person).map(shortDate);
+	html += card("RPE drift at fixed %", "same load, week over week · falling = stronger, climbing = deload",
+		lineChart(drift.map((d, i) => ({ pts: d.pts, cls: "c" + (i % 6 + 1) })), drift.length ? drift[0].pts.map(p => shortDate(p.x)) : wkLabels,
+			{ yLabel: "average RPE", xLabel: "week beginning", emptyMsg: "fills in once a percentage-based set is logged" })
+		+ (drift.length ? legend(drift.map((d, i) => ({ cls: "c" + (i % 6 + 1), label: d.pct + "% of max" }))) : ""));
 
 	// 4. knee dose-response (Manny)
 	const knee = kneeDose(person);
-	if (knee.length) {
+	const hasKneeCheck = (prog.checkins || []).some(c => c.person === person && c.id === "knee_am");
+	if (hasKneeCheck || knee.length) {
 		// only mornings that actually follow leg work are a dose; the rest are the
 		// baseline this is measured against
 		const dosed = knee.filter(k => k.x > 0);
@@ -259,48 +268,44 @@ function renderGraphs() {
 
 	// 5. hard sets per muscle
 	const mus = weeklyMuscleSets(person);
-	if (mus.muscles.length) {
-		html += card("Hard sets per muscle per week", "RPE ≥ 7 only · a set counts toward every muscle it trains, so the bars deliberately add up to more than your total sets",
-			comboChart(
-				mus.weeks.map((w, wi) => ({ label: shortDate(w), values: mus.muscles.map(m => m.counts[wi]) })),
-				mus.muscles.map((m, i) => ({ cls: "c" + (i % 6 + 1) })),
-				null,
-				{ yLabel: "hard sets", xLabel: "week beginning", emptyMsg: "no sets at RPE 7+ yet" }
-			) + legend(mus.muscles.map((m, i) => ({ cls: "c" + (i % 6 + 1), label: m.name }))));
-	}
+	html += card("Hard sets per muscle per week", "RPE ≥ 7 · a set counts toward every muscle it trains, so bars overlap",
+		comboChart(
+			mus.muscles.length
+				? mus.weeks.map((w, wi) => ({ label: shortDate(w), values: mus.muscles.map(m => m.counts[wi]) }))
+				: wkLabels.map(l => ({ label: l, values: [0] })),
+			mus.muscles.length ? mus.muscles.map((m, i) => ({ cls: "c" + (i % 6 + 1) })) : [{ cls: "c1" }],
+			null,
+			{ yLabel: "hard sets", xLabel: "week beginning", emptyMsg: "fills in once a set is logged at RPE 7 or above" }
+		) + (mus.muscles.length ? legend(mus.muscles.map((m, i) => ({ cls: "c" + (i % 6 + 1), label: m.name }))) : ""));
 
 	// 6. sleep vs session quality (weekly averages)
 	const sq = weeklySleepQuality(person);
-	if (sq.some(r => r.sleep != null || r.quality != null)) {
-		html += card("Sleep vs session quality", "weekly averages · days with nothing entered are skipped, never counted as zero",
-			lineChart([
-				{ pts: sq.map(r => ({ x: r.week, y: r.sleep })), cls: "c5" },
-				{ pts: sq.map(r => ({ x: r.week, y: r.quality })), cls: "c1" }
-			], sq.map(r => shortDate(r.week)), {
-				zeroBase: true, yLabel: "hours / rating", xLabel: "week beginning",
-				note: "two people over a few weeks is not enough to call a correlation real"
-			})
-			+ legend([{ cls: "c5", label: "avg hours in bed" }, { cls: "c1", label: "avg session rating 1–5" }]));
-	}
+	html += card("Sleep vs session quality", "weekly averages · blank days are skipped, never counted as zero",
+		lineChart([
+			{ pts: sq.map(r => ({ x: r.week, y: r.sleep })), cls: "c5" },
+			{ pts: sq.map(r => ({ x: r.week, y: r.quality })), cls: "c1" }
+		], sq.map(r => shortDate(r.week)), {
+			zeroBase: true, yLabel: "hours / rating", xLabel: "week beginning",
+			emptyMsg: "fills in from the morning sleep entry and the session rating",
+			note: sq.some(r => r.sleep != null) ? "two people over a few weeks is not enough to call a correlation real" : null
+		})
+		+ legend([{ cls: "c5", label: "avg hours in bed" }, { cls: "c1", label: "avg session rating 1–5" }]));
 
 	// 7. bodyweight and relative strength
 	const bw = bodyweightSeries(person);
-	if (bw.length) {
-		const byDate = new Map(e1rmSeries(person, graphLift).map(p => [p.x, p.y]));
-		const rel = bw.map(p => ({ x: p.x, y: byDate.has(p.x) ? +(byDate.get(p.x) / p.y).toFixed(2) : null }));
-		html += card("Bodyweight", "with relative strength underneath, on days both were logged",
-			lineChart([{ pts: bw, cls: "c6" }], bw.map(p => shortDate(p.x)),
-				{ yLabel: "bodyweight (lb)", xLabel: "date" })
-			+ (rel.some(r => r.y != null)
-				? `<div class="graph-sub sub-head">Relative strength — ${esc(graphLift)} e1RM per pound of you</div>`
-					+ lineChart([{ pts: rel, cls: "c1" }], rel.map(p => shortDate(p.x)),
-						{ yLabel: "e1RM ÷ bodyweight", xLabel: "date" })
-				: `<div class="chart-note">relative strength needs a bodyweight and a weighted ${esc(graphLift)} set on the same day</div>`));
-	}
+	const byDate = new Map(e1rmSeries(person, graphLift).map(p => [p.x, p.y]));
+	const rel = bw.map(p => ({ x: p.x, y: byDate.has(p.x) ? +(byDate.get(p.x) / p.y).toFixed(2) : null }));
+	html += card("Bodyweight", "with relative strength underneath, on days both were logged",
+		lineChart([{ pts: bw, cls: "c6" }], bw.map(p => shortDate(p.x)),
+			{ yLabel: "bodyweight (lb)", xLabel: "date", emptyMsg: "fills in from the bodyweight entry in the morning check-in" })
+		+ `<div class="graph-sub sub-head">Relative strength — ${esc(graphLift || "lift")} e1RM per pound of you</div>`
+		+ lineChart([{ pts: rel, cls: "c1" }], rel.map(p => shortDate(p.x)),
+			{ yLabel: "e1RM ÷ bodyweight", xLabel: "date", emptyMsg: "needs a bodyweight and a weighted set on the same day" }));
 
 	// 8. adherence
 	const adh = adherence(person);
 	if (adh.length) {
+		// keep this last; it is the only card that is meaningless without a program
 		html += card("Adherence", "how much of the written program actually got done",
 			comboChart(
 				adh.map(r => ({ label: shortDate(r.week), values: [r.prescribed, r.done] })),
@@ -316,8 +321,10 @@ function renderGraphs() {
 				: `<div class="chart-note">nothing skipped yet</div>`));
 	}
 
-	const assumed = sets.filter(s => s.assumedReps && s.reps != null).length;
-	html += `<div class="card chart-note">Reps were taken from the prescription on ${assumed} of ${sets.length} logged sets — that is the "assume they were hit" default, and only edited sets differ.</div>`;
+	if (sets.length) {
+		const assumed = sets.filter(s => s.assumedReps && s.reps != null).length;
+		html += `<div class="card chart-note">Reps were taken from the prescription on ${assumed} of ${sets.length} logged sets — that is the "assume they were hit" default, and only edited sets differ. Anything left blank counts as missing, never as zero.</div>`;
+	}
 
 	host.innerHTML = html;
 	host.querySelectorAll("[data-lift]").forEach(b => {
