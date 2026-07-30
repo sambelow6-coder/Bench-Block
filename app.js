@@ -121,8 +121,8 @@ function renderAll() {
 
 function renderHeader() {
 	const w = weekDef();
-	el("app-title").textContent = "Bench Block — Week " + w.week;
-	el("week-label").textContent = prog.title + " · wk of " + w.week_of + " ▾";
+	el("app-title").innerHTML = "Bench Block — Week " + w.week + ' <span id="week-caret">▾</span>';
+	el("week-label").textContent = "wk of " + w.week_of + " · tap to browse weeks";
 	el("brand").onclick = cycleModal;
 	document.querySelectorAll(".person-btn").forEach(b => {
 		b.classList.toggle("active", b.dataset.person === person);
