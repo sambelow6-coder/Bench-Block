@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.3";
+const APP_VERSION = "v1.4";
 
 let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
@@ -121,8 +121,9 @@ function renderAll() {
 
 function renderHeader() {
 	const w = weekDef();
-	el("week-label").textContent = prog.title + " · Week " + w.week + " · wk of " + w.week_of + " ▾";
-	el("week-label").onclick = cycleModal;
+	el("app-title").textContent = "Bench Block — Week " + w.week;
+	el("week-label").textContent = prog.title + " · wk of " + w.week_of + " ▾";
+	el("brand").onclick = cycleModal;
 	document.querySelectorAll(".person-btn").forEach(b => {
 		b.classList.toggle("active", b.dataset.person === person);
 	});

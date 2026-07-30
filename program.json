@@ -1,509 +1,145 @@
-﻿{
-    "program_version":  4,
-    "meso":  "Mesocycle 1 — Bench Focus",
-    "title":  "Bench Block 1",
-    "current_week":  1,
-    "people":  [
-                   "sam",
-                   "manny"
-               ],
-    "maxes":  {
-                  "sam":  {
-                              "bench":  315,
-                              "squat":  365,
-                              "deadlift":  425
-                          },
-                  "manny":  {
-                                "bench":  335
-                            }
-              },
-    "rules":  [
-                  "Main-lift RPE window 7â€“8 (Sat 6â€“7). Over the window on set 1 â†’ drop 5%, finish, log it.",
-                  "Under the window â†’ finish as written, tap \u0027weight: easy\u0027, ramp comes next week.",
-                  "Manny gate: next-morning knee must be â‰¤ baseline or the dose was too high.",
-                  "No two triceps isolation movements back to back. Bar dips are permanently banned (Sam\u0027s elbows)."
-              ],
-    "checkins":  [
-                     {
-                         "id":  "knee_am",
-                         "person":  "manny",
-                         "label":  "Morning knee check",
-                         "hint":  "0 = silent, 5 = angry. Compare to yesterday morning."
-                     },
-                     {
-                         "id":  "back_am",
-                         "person":  "sam",
-                         "label":  "Morning back check",
-                         "hint":  "0 = silent, 5 = angry. Block-1 watch while the pulls ramp."
-                     }
-                 ],
-    "weeks":  [
-                  {
-                      "week":  1,
-                      "week_of":  "2026-08-03",
-                      "days":  [
-                                   {
-                                       "key":  "mon",
-                                       "title":  "Heavy Bench",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "bench_heavy",
-                                                             "name":  "Comp Bench â€” heavy",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  {
-                                                                        "sam":  "250 lb â€” 3Ã—5 (80%) Â· RPE 7â€“8",
-                                                                        "manny":  "270 lb â€” 3Ã—5 (80%) Â· RPE 7â€“8"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "bench_backoff",
-                                                             "name":  "Comp Bench â€” back-off",
-                                                             "for":  "both",
-                                                             "sets":  2,
-                                                             "rx":  {
-                                                                        "sam":  "230 lb â€” 2Ã—8 (72.5%)",
-                                                                        "manny":  "245 lb â€” 2Ã—8 (72.5%)"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "cs_row",
-                                                             "name":  "Chest-Supported Row",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "lat_pulldown",
-                                                             "name":  "Lat Pulldown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "cable_pushdown",
-                                                             "name":  "Cable Pushdown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10â€“12 Â· RPE 7â€“8"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "tue",
-                                       "title":  "Legs",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "squat",
-                                                             "name":  "Squat",
-                                                             "for":  "sam",
-                                                             "sets":  3,
-                                                             "rx":  "255 lb â€” 3Ã—5 (70%) Â· cap RPE 7"
-                                                         },
-                                                         {
-                                                             "id":  "leg_press",
-                                                             "name":  "Leg Press",
-                                                             "for":  "sam",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7"
-                                                         },
-                                                         {
-                                                             "id":  "ham_curl",
-                                                             "name":  "Hamstring Curl",
-                                                             "for":  "sam",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "spanish_squat",
-                                                             "name":  "Spanish Squat â€” isometric",
-                                                             "for":  "manny",
-                                                             "sets":  5,
-                                                             "rx":  "5 Ã— 45 sec holds Â· hard effort Â· opens the session"
-                                                         },
-                                                         {
-                                                             "id":  "hsr_leg_press",
-                                                             "name":  "HSR Leg Press",
-                                                             "for":  "manny",
-                                                             "sets":  4,
-                                                             "rx":  "4Ã—8 Â· RPE 6â€“7 Â· strict 3 sec down / 3 sec up"
-                                                         },
-                                                         {
-                                                             "id":  "leg_extension",
-                                                             "name":  "Leg Extension",
-                                                             "for":  "manny",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12â€“15 Â· RPE 6 Â· slow + light Â· â‰¤3/10 discomfort OK"
-                                                         },
-                                                         {
-                                                             "id":  "core",
-                                                             "name":  "Core",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3 sets Â· your pick"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "wed",
-                                       "title":  "Volume Bench",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "bench_volume",
-                                                             "name":  "Comp Bench â€” volume",
-                                                             "for":  "both",
-                                                             "sets":  4,
-                                                             "rx":  {
-                                                                        "sam":  "230 lb â€” 4Ã—6 (72.5%) Â· RPE 7â€“8",
-                                                                        "manny":  "245 lb â€” 4Ã—6 (72.5%) Â· RPE 7â€“8"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "incline_bb",
-                                                             "name":  "Incline Barbell Press",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—8â€“10 Â· RPE 7â€“8 (OHP swap OK)"
-                                                         },
-                                                         {
-                                                             "id":  "cable_row",
-                                                             "name":  "Seated Cable Row",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "curls",
-                                                             "name":  "Curls",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10â€“12 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "machine_dip",
-                                                             "name":  "Machine Dip / Pushdown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12â€“15 Â· push to RPE 9â€“10 if you like"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "fri",
-                                       "title":  "Variation",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "cg_bench",
-                                                             "name":  "Close-Grip Bench",
-                                                             "for":  "both",
-                                                             "sets":  4,
-                                                             "rx":  "4Ã—6 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "oh_ext",
-                                                             "name":  "Overhead Cable Extension",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "oa_row",
-                                                             "name":  "One-Arm DB Row",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8 Â· braced on bench (lawnmower)"
-                                                         },
-                                                         {
-                                                             "id":  "rope_pushdown",
-                                                             "name":  "Rope Pushdown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12â€“15 Â· RPE 7â€“8"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "sat",
-                                       "title":  "Moderate Bench + Pull",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "bench_moderate",
-                                                             "name":  "Comp Bench â€” moderate",
-                                                             "for":  "both",
-                                                             "sets":  5,
-                                                             "rx":  {
-                                                                        "sam":  "235 lb â€” 5Ã—3 (75%) Â· RPE 6â€“7",
-                                                                        "manny":  "250 lb â€” 5Ã—3 (75%) Â· RPE 6â€“7"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "deadlift",
-                                                             "name":  "Deadlift",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  {
-                                                                        "sam":  "320 lb â€” 3Ã—3 (75%) Â· cap RPE 7",
-                                                                        "manny":  "3Ã—5 Â· RPE 6â€“7"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "pullups",
-                                                             "name":  "Pull-Ups",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3 Ã— AMRAP Â· pick a grip, keep it consistent"
-                                                         },
-                                                         {
-                                                             "id":  "sat_curls",
-                                                             "name":  "Curls",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "wall_sit",
-                                                             "name":  "Wall Sit",
-                                                             "for":  "manny",
-                                                             "sets":  3,
-                                                             "rx":  "3 Ã— 45 sec"
-                                                         }
-                                                     ]
-                                   }
-                               ]
-                  },
-                  {
-                      "week":  2,
-                      "week_of":  "2026-08-10",
-                      "label":  "filler preview — real week 2 comes from the check-in",
-                      "days":  [
-                                   {
-                                       "key":  "mon",
-                                       "title":  "Heavy Bench",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "bench_heavy",
-                                                             "name":  "Comp Bench â€” heavy",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  {
-                                                                        "sam":  "250 lb â€” 3Ã—5 (80%) Â· RPE 7â€“8",
-                                                                        "manny":  "270 lb â€” 3Ã—5 (80%) Â· RPE 7â€“8"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "bench_backoff",
-                                                             "name":  "Comp Bench â€” back-off",
-                                                             "for":  "both",
-                                                             "sets":  2,
-                                                             "rx":  {
-                                                                        "sam":  "230 lb â€” 2Ã—8 (72.5%)",
-                                                                        "manny":  "245 lb â€” 2Ã—8 (72.5%)"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "cs_row",
-                                                             "name":  "Chest-Supported Row",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "lat_pulldown",
-                                                             "name":  "Lat Pulldown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "cable_pushdown",
-                                                             "name":  "Cable Pushdown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10â€“12 Â· RPE 7â€“8"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "tue",
-                                       "title":  "Legs",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "squat",
-                                                             "name":  "Squat",
-                                                             "for":  "sam",
-                                                             "sets":  3,
-                                                             "rx":  "255 lb â€” 3Ã—5 (70%) Â· cap RPE 7"
-                                                         },
-                                                         {
-                                                             "id":  "leg_press",
-                                                             "name":  "Leg Press",
-                                                             "for":  "sam",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7"
-                                                         },
-                                                         {
-                                                             "id":  "ham_curl",
-                                                             "name":  "Hamstring Curl",
-                                                             "for":  "sam",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "spanish_squat",
-                                                             "name":  "Spanish Squat â€” isometric",
-                                                             "for":  "manny",
-                                                             "sets":  5,
-                                                             "rx":  "5 Ã— 45 sec holds Â· hard effort Â· opens the session"
-                                                         },
-                                                         {
-                                                             "id":  "hsr_leg_press",
-                                                             "name":  "HSR Leg Press",
-                                                             "for":  "manny",
-                                                             "sets":  4,
-                                                             "rx":  "4Ã—8 Â· RPE 6â€“7 Â· strict 3 sec down / 3 sec up"
-                                                         },
-                                                         {
-                                                             "id":  "leg_extension",
-                                                             "name":  "Leg Extension",
-                                                             "for":  "manny",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12â€“15 Â· RPE 6 Â· slow + light Â· â‰¤3/10 discomfort OK"
-                                                         },
-                                                         {
-                                                             "id":  "core",
-                                                             "name":  "Core",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3 sets Â· your pick"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "wed",
-                                       "title":  "Volume Bench",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "bench_volume",
-                                                             "name":  "Comp Bench â€” volume",
-                                                             "for":  "both",
-                                                             "sets":  4,
-                                                             "rx":  {
-                                                                        "sam":  "230 lb â€” 4Ã—6 (72.5%) Â· RPE 7â€“8",
-                                                                        "manny":  "245 lb â€” 4Ã—6 (72.5%) Â· RPE 7â€“8"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "incline_bb",
-                                                             "name":  "Incline Barbell Press",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—8â€“10 Â· RPE 7â€“8 (OHP swap OK)"
-                                                         },
-                                                         {
-                                                             "id":  "cable_row",
-                                                             "name":  "Seated Cable Row",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "curls",
-                                                             "name":  "Curls",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10â€“12 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "machine_dip",
-                                                             "name":  "Machine Dip / Pushdown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12â€“15 Â· push to RPE 9â€“10 if you like"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "fri",
-                                       "title":  "Variation",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "cg_bench",
-                                                             "name":  "Close-Grip Bench",
-                                                             "for":  "both",
-                                                             "sets":  4,
-                                                             "rx":  "4Ã—6 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "oh_ext",
-                                                             "name":  "Overhead Cable Extension",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "oa_row",
-                                                             "name":  "One-Arm DB Row",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8 Â· braced on bench (lawnmower)"
-                                                         },
-                                                         {
-                                                             "id":  "rope_pushdown",
-                                                             "name":  "Rope Pushdown",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—12â€“15 Â· RPE 7â€“8"
-                                                         }
-                                                     ]
-                                   },
-                                   {
-                                       "key":  "sat",
-                                       "title":  "Moderate Bench + Pull",
-                                       "exercises":  [
-                                                         {
-                                                             "id":  "bench_moderate",
-                                                             "name":  "Comp Bench â€” moderate",
-                                                             "for":  "both",
-                                                             "sets":  5,
-                                                             "rx":  {
-                                                                        "sam":  "235 lb â€” 5Ã—3 (75%) Â· RPE 6â€“7",
-                                                                        "manny":  "250 lb â€” 5Ã—3 (75%) Â· RPE 6â€“7"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "deadlift",
-                                                             "name":  "Deadlift",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  {
-                                                                        "sam":  "320 lb â€” 3Ã—3 (75%) Â· cap RPE 7",
-                                                                        "manny":  "3Ã—5 Â· RPE 6â€“7"
-                                                                    }
-                                                         },
-                                                         {
-                                                             "id":  "pullups",
-                                                             "name":  "Pull-Ups",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3 Ã— AMRAP Â· pick a grip, keep it consistent"
-                                                         },
-                                                         {
-                                                             "id":  "sat_curls",
-                                                             "name":  "Curls",
-                                                             "for":  "both",
-                                                             "sets":  3,
-                                                             "rx":  "3Ã—10 Â· RPE 7â€“8"
-                                                         },
-                                                         {
-                                                             "id":  "wall_sit",
-                                                             "name":  "Wall Sit",
-                                                             "for":  "manny",
-                                                             "sets":  3,
-                                                             "rx":  "3 Ã— 45 sec"
-                                                         }
-                                                     ]
-                                   }
-                               ]
-                  }
-              ]
+{
+	"program_version": 5,
+	"meso": "Mesocycle 1 — Bench Focus",
+	"title": "Bench Block 1",
+	"current_week": 1,
+	"people": ["sam", "manny"],
+	"maxes": { "sam": { "bench": 315, "squat": 365, "deadlift": 425 }, "manny": { "bench": 335 } },
+	"rules": [
+		"Main-lift RPE window 7–8 (Sat 6–7). Over the window on set 1 → drop 5%, finish, log it.",
+		"Under the window → finish as written, tap 'weight: easy', ramp comes next week.",
+		"Manny gate: next-morning knee must be ≤ baseline or the dose was too high.",
+		"No two triceps isolation movements back to back. Bar dips are permanently banned (Sam's elbows)."
+	],
+	"checkins": [
+		{ "id": "knee_am", "person": "manny", "label": "Morning knee check", "hint": "0 = silent, 5 = angry. Compare to yesterday morning." },
+		{ "id": "back_am", "person": "sam", "label": "Morning back check", "hint": "0 = silent, 5 = angry. Block-1 watch while the pulls ramp." }
+	],
+	"weeks": [
+		{
+			"week": 1,
+			"week_of": "2026-08-03",
+			"days": [
+				{
+					"key": "mon", "title": "Heavy Bench",
+					"exercises": [
+						{ "id": "bench_heavy", "name": "Comp Bench — heavy", "for": "both", "sets": 3,
+						  "rx": { "sam": "250 lb — 3×5 (80%) · RPE 7–8", "manny": "270 lb — 3×5 (80%) · RPE 7–8" } },
+						{ "id": "bench_backoff", "name": "Comp Bench — back-off", "for": "both", "sets": 2,
+						  "rx": { "sam": "230 lb — 2×8 (72.5%)", "manny": "245 lb — 2×8 (72.5%)" } },
+						{ "id": "cs_row", "name": "Chest-Supported Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "lat_pulldown", "name": "Lat Pulldown", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "cable_pushdown", "name": "Cable Pushdown", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" }
+					]
+				},
+				{
+					"key": "tue", "title": "Legs",
+					"exercises": [
+						{ "id": "squat", "name": "Squat", "for": "sam", "sets": 3, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
+						{ "id": "leg_press", "name": "Leg Press", "for": "sam", "sets": 3, "rx": "3×10 · RPE 7" },
+						{ "id": "ham_curl", "name": "Hamstring Curl", "for": "sam", "sets": 3, "rx": "3×12 · RPE 7–8" },
+						{ "id": "spanish_squat", "name": "Spanish Squat — isometric", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
+						{ "id": "hsr_leg_press", "name": "HSR Leg Press", "for": "manny", "sets": 4, "rx": "4×8 · RPE 6–7 · strict 3 sec down / 3 sec up" },
+						{ "id": "leg_extension", "name": "Leg Extension", "for": "manny", "sets": 3, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
+						{ "id": "core", "name": "Core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
+					]
+				},
+				{
+					"key": "wed", "title": "Volume Bench",
+					"exercises": [
+						{ "id": "bench_volume", "name": "Comp Bench — volume", "for": "both", "sets": 4,
+						  "rx": { "sam": "230 lb — 4×6 (72.5%) · RPE 7–8", "manny": "245 lb — 4×6 (72.5%) · RPE 7–8" } },
+						{ "id": "incline_bb", "name": "Incline Barbell Press", "for": "both", "sets": 3, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
+						{ "id": "cable_row", "name": "Seated Cable Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" },
+						{ "id": "machine_dip", "name": "Machine Dip / Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · push to RPE 9–10 if you like" }
+					]
+				},
+				{
+					"key": "fri", "title": "Variation",
+					"exercises": [
+						{ "id": "cg_bench", "name": "Close-Grip Bench", "for": "both", "sets": 4, "rx": "4×6 · RPE 7–8" },
+						{ "id": "oh_ext", "name": "Overhead Cable Extension", "for": "both", "sets": 3, "rx": "3×12 · RPE 7–8" },
+						{ "id": "oa_row", "name": "One-Arm DB Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
+						{ "id": "rope_pushdown", "name": "Rope Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · RPE 7–8" }
+					]
+				},
+				{
+					"key": "sat", "title": "Moderate Bench + Pull",
+					"exercises": [
+						{ "id": "bench_moderate", "name": "Comp Bench — moderate", "for": "both", "sets": 5,
+						  "rx": { "sam": "235 lb — 5×3 (75%) · RPE 6–7", "manny": "250 lb — 5×3 (75%) · RPE 6–7" } },
+						{ "id": "deadlift", "name": "Deadlift", "for": "both", "sets": 3,
+						  "rx": { "sam": "320 lb — 3×3 (75%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
+						{ "id": "pullups", "name": "Pull-Ups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
+						{ "id": "sat_curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "wall_sit", "name": "Wall Sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
+					]
+				}
+			]
+		},
+		{
+			"week": 2,
+			"week_of": "2026-08-10",
+			"label": "filler preview — real week 2 comes from the check-in",
+			"days": [
+				{
+					"key": "mon", "title": "Heavy Bench",
+					"exercises": [
+						{ "id": "bench_heavy", "name": "Comp Bench — heavy", "for": "both", "sets": 3,
+						  "rx": { "sam": "250 lb — 3×5 (80%) · RPE 7–8", "manny": "270 lb — 3×5 (80%) · RPE 7–8" } },
+						{ "id": "bench_backoff", "name": "Comp Bench — back-off", "for": "both", "sets": 2,
+						  "rx": { "sam": "230 lb — 2×8 (72.5%)", "manny": "245 lb — 2×8 (72.5%)" } },
+						{ "id": "cs_row", "name": "Chest-Supported Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "lat_pulldown", "name": "Lat Pulldown", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "cable_pushdown", "name": "Cable Pushdown", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" }
+					]
+				},
+				{
+					"key": "tue", "title": "Legs",
+					"exercises": [
+						{ "id": "squat", "name": "Squat", "for": "sam", "sets": 3, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
+						{ "id": "leg_press", "name": "Leg Press", "for": "sam", "sets": 3, "rx": "3×10 · RPE 7" },
+						{ "id": "ham_curl", "name": "Hamstring Curl", "for": "sam", "sets": 3, "rx": "3×12 · RPE 7–8" },
+						{ "id": "spanish_squat", "name": "Spanish Squat — isometric", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
+						{ "id": "hsr_leg_press", "name": "HSR Leg Press", "for": "manny", "sets": 4, "rx": "4×8 · RPE 6–7 · strict 3 sec down / 3 sec up" },
+						{ "id": "leg_extension", "name": "Leg Extension", "for": "manny", "sets": 3, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
+						{ "id": "core", "name": "Core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
+					]
+				},
+				{
+					"key": "wed", "title": "Volume Bench",
+					"exercises": [
+						{ "id": "bench_volume", "name": "Comp Bench — volume", "for": "both", "sets": 4,
+						  "rx": { "sam": "230 lb — 4×6 (72.5%) · RPE 7–8", "manny": "245 lb — 4×6 (72.5%) · RPE 7–8" } },
+						{ "id": "incline_bb", "name": "Incline Barbell Press", "for": "both", "sets": 3, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
+						{ "id": "cable_row", "name": "Seated Cable Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10–12 · RPE 7–8" },
+						{ "id": "machine_dip", "name": "Machine Dip / Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · push to RPE 9–10 if you like" }
+					]
+				},
+				{
+					"key": "fri", "title": "Variation",
+					"exercises": [
+						{ "id": "cg_bench", "name": "Close-Grip Bench", "for": "both", "sets": 4, "rx": "4×6 · RPE 7–8" },
+						{ "id": "oh_ext", "name": "Overhead Cable Extension", "for": "both", "sets": 3, "rx": "3×12 · RPE 7–8" },
+						{ "id": "oa_row", "name": "One-Arm DB Row", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
+						{ "id": "rope_pushdown", "name": "Rope Pushdown", "for": "both", "sets": 3, "rx": "3×12–15 · RPE 7–8" }
+					]
+				},
+				{
+					"key": "sat", "title": "Moderate Bench + Pull",
+					"exercises": [
+						{ "id": "bench_moderate", "name": "Comp Bench — moderate", "for": "both", "sets": 5,
+						  "rx": { "sam": "235 lb — 5×3 (75%) · RPE 6–7", "manny": "250 lb — 5×3 (75%) · RPE 6–7" } },
+						{ "id": "deadlift", "name": "Deadlift", "for": "both", "sets": 3,
+						  "rx": { "sam": "320 lb — 3×3 (75%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
+						{ "id": "pullups", "name": "Pull-Ups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
+						{ "id": "sat_curls", "name": "Curls", "for": "both", "sets": 3, "rx": "3×10 · RPE 7–8" },
+						{ "id": "wall_sit", "name": "Wall Sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
+					]
+				}
+			]
+		}
+	]
 }
