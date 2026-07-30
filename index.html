@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<title>Bench Block</title>
+	<meta name="theme-color" content="#14161d">
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="icon" href="icons/icon-192.png">
+	<link rel="apple-touch-icon" href="icons/icon-192.png">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Bench Block">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header id="topbar">
+		<div id="brand">
+			<div id="app-title">Bench Block</div>
+			<div id="week-label">loading…</div>
+		</div>
+		<div id="person-toggle" role="tablist">
+			<button class="person-btn" data-person="sam">SAM</button>
+			<button class="person-btn" data-person="manny">MANNY</button>
+		</div>
+	</header>
+
+	<nav id="day-tabs"></nav>
+
+	<main id="content">
+		<div id="checkin-slot"></div>
+		<div id="day-card"></div>
+	</main>
+
+	<footer id="bottombar">
+		<button id="send-btn">Send to Coach <span id="pending-badge"></span></button>
+		<div id="footer-links">
+			<button class="linkish" id="resend-all">resend everything</button>
+			<span id="version-tag"></span>
+		</div>
+	</footer>
+
+	<div id="modal-backdrop" class="hidden">
+		<div id="modal"></div>
+	</div>
+
+	<script src="app.js"></script>
+</body>
+</html>
