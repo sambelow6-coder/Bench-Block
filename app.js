@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.1";
+const APP_VERSION = "v1.2";
 
 let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
@@ -199,7 +199,7 @@ function renderDay() {
 	for (const ex of day.exercises) html += exerciseCard(ex, date, day.key);
 
 	// ad-hoc additions for this person/date/day
-	for (const add of entries.filter(e => e.type === "add" && e.person === person && e.date === date && e.day === day.key)) {
+	for (const add of entries.filter(e => e.type === "add" && !e.retracted && e.person === person && e.date === date && e.day === day.key)) {
 		html += exerciseCard({ id: "add:" + add.id, name: add.exName + " (added)", for: person, sets: 5, rx: add.note ? "added: " + add.note : "added today" }, date, day.key);
 	}
 
@@ -223,12 +223,22 @@ function sessionNoteBtn(session) {
 function exerciseCard(ex, date, dayKey) {
 	const mine = ex.for === "both" || ex.for === person;
 	const note = findEntry({ type: "note", person, date, ex: ex.id });
-	let html = `<div class="card ${mine ? "" : "not-yours"}">
-		<div class="ex-name">${esc(ex.name)}
-			${mine ? `<button class="note-btn ${note ? "has-note" : ""}" data-note="${ex.id}" data-name="${esc(ex.name)}">✎</button>` : ""}
-		</div>
-		${rxLines(ex)}`;
+	const isAdded = ex.id.startsWith("add:");
+	const skipRec = findEntry({ type: "exskip", person, date, ex: ex.id });
+	const exSkipped = !!(skipRec && !skipRec.retracted);
+	let controls = "";
 	if (mine) {
+		controls += `<button class="note-btn ${note ? "has-note" : ""}" data-note="${ex.id}" data-name="${esc(ex.name)}">✎</button>`;
+		if (!exSkipped) controls += `<button class="mini-btn" data-exskip="${ex.id}" data-name="${esc(ex.name)}">skip</button>`;
+		if (isAdded) controls += `<button class="mini-btn danger" data-del-add="${ex.id.slice(4)}" data-name="${esc(ex.name)}">✕</button>`;
+	}
+	let html = `<div class="card ${mine ? "" : "not-yours"}">
+		<div class="ex-name">${esc(ex.name)}${controls}</div>
+		${rxLines(ex)}`;
+	if (mine && exSkipped) {
+		html += `<div class="ex-skip-line">skipped${skipRec.note ? " — “" + esc(skipRec.note) + "”" : ""}
+			<button class="linkish" data-exunskip="${ex.id}">un-skip</button></div>`;
+	} else if (mine) {
 		let bubbles = "";
 		for (let s = 1; s <= ex.sets; s++) {
 			const rec = findEntry({ type: "set", person, date, ex: ex.id, set: s });
@@ -283,6 +293,35 @@ function wireDay(day, date) {
 			if (v === null) return;
 			upsert(match, { exName: b.dataset.name, day: day.key, note: v });
 			renderDay(); renderFooter();
+		};
+	});
+	document.querySelectorAll("[data-exskip]").forEach(b => {
+		b.onclick = async () => {
+			const v = await noteModal("Skipping " + b.dataset.name + " — why? (optional)", "");
+			if (v === null) return;
+			upsert({ type: "exskip", person, date, ex: b.dataset.exskip }, { exName: b.dataset.name, day: day.key, note: v, retracted: false });
+			renderDay(); renderFooter();
+		};
+	});
+	document.querySelectorAll("[data-exunskip]").forEach(b => {
+		b.onclick = () => {
+			const match = { type: "exskip", person, date, ex: b.dataset.exunskip };
+			const rec = findEntry(match);
+			if (rec && rec.synced) upsert(match, { retracted: true });
+			else if (rec) { entries = entries.filter(e => e !== rec); save(); }
+			renderDay(); renderFooter();
+		};
+	});
+	document.querySelectorAll("[data-del-add]").forEach(b => {
+		b.onclick = () => {
+			if (!confirm("Delete " + b.dataset.name + "?")) return;
+			const rec = entries.find(e => e.id === b.dataset.delAdd);
+			if (!rec) return;
+			if (rec.synced) Object.assign(rec, { retracted: true, synced: false, ts: new Date().toISOString() });
+			else entries = entries.filter(e => e !== rec);
+			// drop this exercise's local-only child records (sets/feels/notes never sent)
+			entries = entries.filter(e => !(e.ex === "add:" + rec.id && !e.synced));
+			save(); renderDay(); renderFooter();
 		};
 	});
 	const skipBtn = el("skip-day");

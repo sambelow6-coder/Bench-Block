@@ -16,7 +16,8 @@ intelligence stays in the weekly Claude conversation.
 ## Data rules (consumer = Claude)
 - Latest record per `(person, date, type, ex, set/field)` wins.
 - `rpe: null` / `value: null` = that fact was cleared.
-- `skip` with `retracted: true` = the skip was undone after it synced.
+- `skip` (whole day) / `exskip` (one exercise) / `add` with `retracted: true`
+  = that record was undone/deleted after it synced.
 - Entries are never edited in place across exports — corrections arrive as
   re-sent records with newer `ts`.
 
