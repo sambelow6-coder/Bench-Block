@@ -9,12 +9,24 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.2";
+const APP_VERSION = "v1.3";
 
 let prog = null;
 let person = localStorage.getItem(LS_PERSON) || "sam";
 let selectedDay = null;
+let viewWeek = null;
 let entries = load(LS_ENTRIES, []);
+
+const DAY_OFFSET = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
+
+function weekDef() {
+	return prog.weeks.find(w => w.week === viewWeek) || prog.weeks[0];
+}
+function dayDateStr(w, dayKey) {
+	const d = new Date(w.week_of + "T12:00:00");
+	d.setDate(d.getDate() + (DAY_OFFSET[dayKey] || 0));
+	return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
 
 /* ---------- tiny utils ---------- */
 
@@ -78,6 +90,10 @@ async function loadProgram() {
 		}
 		toast("Offline — using cached program");
 	}
+	// back-compat: wrap a cached single-week program into the weeks shape
+	if (!prog.weeks) prog.weeks = [{ week: prog.week || 1, week_of: prog.week_of, days: prog.days }];
+	if (!prog.current_week) prog.current_week = prog.weeks[0].week;
+	if (!viewWeek || !prog.weeks.some(w => w.week === viewWeek)) viewWeek = prog.current_week;
 	if (!selectedDay) selectedDay = defaultDay();
 	renderAll();
 }
@@ -85,7 +101,8 @@ async function loadProgram() {
 function defaultDay() {
 	const map = { 0: "mon", 1: "mon", 2: "tue", 3: "wed", 4: "fri", 5: "fri", 6: "sat" };
 	const key = map[new Date().getDay()];
-	return prog.days.some(d => d.key === key) ? key : prog.days[0].key;
+	const days = weekDef().days;
+	return days.some(d => d.key === key) ? key : days[0].key;
 }
 function dayKeyToday() {
 	const map = { 1: "mon", 2: "tue", 3: "wed", 5: "fri", 6: "sat" };
@@ -103,14 +120,16 @@ function renderAll() {
 }
 
 function renderHeader() {
-	el("week-label").textContent = prog.title + " · Week " + prog.week + " · wk of " + prog.week_of;
+	const w = weekDef();
+	el("week-label").textContent = prog.title + " · Week " + w.week + " · wk of " + w.week_of + " ▾";
+	el("week-label").onclick = cycleModal;
 	document.querySelectorAll(".person-btn").forEach(b => {
 		b.classList.toggle("active", b.dataset.person === person);
 	});
 }
 
 function renderTabs() {
-	el("day-tabs").innerHTML = prog.days.map(d =>
+	el("day-tabs").innerHTML = weekDef().days.map(d =>
 		`<button class="day-tab ${d.key === selectedDay ? "active" : ""} ${d.key === dayKeyToday() ? "today" : ""}" data-day="${d.key}">${d.key.toUpperCase()}</button>`
 	).join("");
 	document.querySelectorAll(".day-tab").forEach(b => {
@@ -175,13 +194,20 @@ function rxLines(ex) {
 }
 
 function renderDay() {
-	const day = prog.days.find(d => d.key === selectedDay);
-	const date = todayStr();
+	const w = weekDef();
+	const day = w.days.find(d => d.key === selectedDay) || w.days[0];
+	const date = dayDateStr(w, day.key);
 	const skipRec = findEntry({ type: "skip", person, date, day: day.key });
 	const skip = skipRec && !skipRec.retracted ? skipRec : null;
 	const session = findEntry({ type: "session", person, date, day: day.key });
 
-	let html = `
+	let html = "";
+	if (w.week !== prog.current_week) html += `
+		<div class="card week-banner">Viewing week ${w.week}${w.label ? " · " + esc(w.label) : ""} — this day is ${date}
+			<div><button class="linkish" id="back-current">back to current week</button></div>
+		</div>`;
+
+	html += `
 		<div class="day-head">
 			<div class="day-title">${esc(day.title)}</div>
 			<div class="day-actions">
@@ -228,7 +254,7 @@ function exerciseCard(ex, date, dayKey) {
 	const exSkipped = !!(skipRec && !skipRec.retracted);
 	let controls = "";
 	if (mine) {
-		controls += `<button class="note-btn ${note ? "has-note" : ""}" data-note="${ex.id}" data-name="${esc(ex.name)}">✎</button>`;
+		controls += `<button class="note-btn ${note && note.note ? "has-note" : ""}" data-note="${ex.id}" data-name="${esc(ex.name)}">✎</button>`;
 		if (!exSkipped) controls += `<button class="mini-btn" data-exskip="${ex.id}" data-name="${esc(ex.name)}">skip</button>`;
 		if (isAdded) controls += `<button class="mini-btn danger" data-del-add="${ex.id.slice(4)}" data-name="${esc(ex.name)}">✕</button>`;
 	}
@@ -243,8 +269,10 @@ function exerciseCard(ex, date, dayKey) {
 		for (let s = 1; s <= ex.sets; s++) {
 			const rec = findEntry({ type: "set", person, date, ex: ex.id, set: s });
 			const done = rec && rec.rpe !== null && rec.rpe !== undefined;
-			bubbles += `<button class="set-bubble ${done ? "done" : ""}" data-set-ex="${ex.id}" data-set-name="${esc(ex.name)}" data-set="${s}">
-				${done ? (rec.rpe === 5 ? "≤5" : rec.rpe) : s}</button>`;
+			const label = done
+				? `<span>${rec.rpe === 5 ? "≤5" : rec.rpe}</span>${rec.weight != null ? `<span class="sub">${rec.weight}</span>` : ""}`
+				: s;
+			bubbles += `<button class="set-bubble ${done ? "done" : ""}" data-set-ex="${ex.id}" data-set-name="${esc(ex.name)}" data-set="${s}">${label}</button>`;
 		}
 		html += `<div class="sets-row">${bubbles}</div>`;
 		html += feelRow(ex, date);
@@ -274,8 +302,10 @@ function feelRow(ex, date) {
 }
 
 function wireDay(day, date) {
+	const back = el("back-current");
+	if (back) back.onclick = () => { viewWeek = prog.current_week; renderAll(); };
 	document.querySelectorAll("[data-set-ex]").forEach(b => {
-		b.onclick = () => rpeModal(b.dataset.setEx, b.dataset.setName, Number(b.dataset.set), day.key);
+		b.onclick = () => rpeModal(b.dataset.setEx, b.dataset.setName, Number(b.dataset.set), day.key, date);
 	});
 	document.querySelectorAll("[data-feel-ex]").forEach(b => {
 		b.onclick = () => {
@@ -367,6 +397,34 @@ function wireDay(day, date) {
 	};
 }
 
+/* ---------- cycle browser ---------- */
+
+function cycleModal() {
+	const blocks = {};
+	for (const w of prog.weeks) {
+		const b = Math.ceil(w.week / 4);
+		(blocks[b] = blocks[b] || []).push(w);
+	}
+	let html = `<div class="modal-title">${esc(prog.meso || prog.title)}</div>
+		<div class="modal-sub">${prog.weeks.length} week${prog.weeks.length > 1 ? "s" : ""} loaded · tap a week to view it (everything logged there comes with it)</div>`;
+	for (const b of Object.keys(blocks)) {
+		const ws = blocks[b];
+		html += `<div class="block-head">Block ${b} — week${ws.length > 1 ? "s" : ""} ${ws[0].week}${ws.length > 1 ? "–" + ws[ws.length - 1].week : ""}</div>`;
+		for (const w of ws) {
+			const dates = w.days.map(d => dayDateStr(w, d.key));
+			const logged = entries.filter(e => dates.includes(e.date)).length;
+			html += `<button class="week-row ${w.week === viewWeek ? "viewing" : ""}" data-week="${w.week}">
+				<span>Week ${w.week}${w.label ? " · " + esc(w.label) : ""}</span>
+				<span class="week-meta">wk of ${w.week_of}${w.week === prog.current_week ? " · current" : ""}${logged ? " · " + logged + " logged" : ""}</span>
+			</button>`;
+		}
+	}
+	openModal(html);
+	el("modal").querySelectorAll("[data-week]").forEach(b => {
+		b.onclick = () => { viewWeek = Number(b.dataset.week); closeModal(); renderAll(); };
+	});
+}
+
 /* ---------- modals ---------- */
 
 function openModal(html) {
@@ -376,11 +434,20 @@ function openModal(html) {
 function closeModal() { el("modal-backdrop").classList.add("hidden"); }
 el("modal-backdrop").addEventListener("click", e => { if (e.target.id === "modal-backdrop") closeModal(); });
 
-function rpeModal(exId, exName, set, dayKey) {
+function rpeModal(exId, exName, set, dayKey, date) {
 	const vals = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
+	// prefill weight: this set's logged weight, else the latest weight on this exercise today
+	const existing = findEntry({ type: "set", person, date, ex: exId, set });
+	let pre = existing && existing.weight != null ? existing.weight : "";
+	if (pre === "") {
+		const prior = entries.filter(e => e.type === "set" && e.person === person && e.date === date && e.ex === exId && e.weight != null);
+		if (prior.length) pre = prior[prior.length - 1].weight;
+	}
 	openModal(`
 		<div class="modal-title">${esc(exName)} — set ${set}</div>
-		<div class="modal-sub">How hard was it? (RPE)</div>
+		<div class="modal-sub">Weight used (lb) — optional</div>
+		<input class="modal-input" id="m-weight" type="number" inputmode="decimal" step="2.5" min="0" placeholder="e.g. 185" value="${pre}">
+		<div class="modal-sub">How hard was it? (RPE) — tapping saves both</div>
 		<div class="rpe-grid">
 			${vals.map(v => `<button class="rpe-btn ${v >= 7 && v <= 8 ? "in-window" : ""}" data-rpe="${v}">${v}</button>`).join("")}
 			<button class="rpe-btn" data-rpe="5">≤5</button>
@@ -388,8 +455,13 @@ function rpeModal(exId, exName, set, dayKey) {
 		</div>`);
 	el("modal").querySelectorAll("[data-rpe]").forEach(b => {
 		b.onclick = () => {
-			const v = b.dataset.rpe === "clear" ? null : Number(b.dataset.rpe);
-			upsert({ type: "set", person, date: todayStr(), ex: exId, set }, { exName, day: dayKey, rpe: v });
+			const clear = b.dataset.rpe === "clear";
+			const wv = parseFloat(el("m-weight").value);
+			upsert({ type: "set", person, date, ex: exId, set }, {
+				exName, day: dayKey,
+				rpe: clear ? null : Number(b.dataset.rpe),
+				weight: clear || isNaN(wv) ? null : wv
+			});
 			closeModal(); renderDay(); renderFooter();
 		};
 	});
