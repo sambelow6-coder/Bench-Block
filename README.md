@@ -17,6 +17,14 @@ intelligence stays in the weekly Claude conversation.
   confirm receipt — hence "resend everything" (duplicates are harmless, see
   dedup rules) and "save a file instead" as a manual escape hatch.
 
+- **Shared log:** the same Sheet is read back as CSV (`gviz/tq?tqx=out:csv`)
+  on boot, on `visibilitychange`, after a send, and via ↻ refresh, then merged
+  by logical key so both lifters see one combined history on every device —
+  the Sheet, not any one phone, is the durable store. Requires the Sheet set
+  to "anyone with the link → Viewer" (link-sharing, NOT publish-to-web: fewer
+  clicks, no multi-minute page cache). Un-sent local edits win locally and win
+  in the Sheet too, since the coach resolves latest-ts-per-fact.
+
 ## Data rules (consumer = Claude)
 - Latest record per `(person, date, type, ex, set/field)` wins.
 - `rpe: null` / `value: null` = that fact was cleared.
