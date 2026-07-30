@@ -1,5 +1,5 @@
 {
-	"program_version": 6,
+	"program_version": 7,
 	"meso": "Mesocycle 1 — Bench Focus",
 	"title": "Bench Block 1",
 	"current_week": 1,
@@ -87,6 +87,9 @@
 					]
 				},
 				{
+					"key": "thu", "title": "Rest — check-in only", "exercises": []
+				},
+				{
 					"key": "fri", "title": "Variation",
 					"exercises": [
 						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
@@ -106,6 +109,9 @@
 						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
 					]
+				},
+				{
+					"key": "sun", "title": "Rest — check-in only", "exercises": []
 				}
 			]
 		},
@@ -150,6 +156,9 @@
 					]
 				},
 				{
+					"key": "thu", "title": "Rest — check-in only", "exercises": []
+				},
+				{
 					"key": "fri", "title": "Variation",
 					"exercises": [
 						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
@@ -169,6 +178,9 @@
 						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
 					]
+				},
+				{
+					"key": "sun", "title": "Rest — check-in only", "exercises": []
 				}
 			]
 		}

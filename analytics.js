@@ -72,9 +72,15 @@ function doneSets(person) {
 		});
 }
 
+/* Any lift with logged sets — weight not required, so the picker still works
+   before anyone has typed a weight (the e1RM chart says so itself instead of
+   the page silently having no selected lift). */
 function liftsAvailable(person) {
 	const s = new Set();
-	for (const d of doneSets(person)) if (d.lift && d.weight != null) s.add(d.lift);
+	for (const d of doneSets(person)) if (d.lift) s.add(d.lift);
+	if (!s.size) for (const w of prog.weeks) for (const dy of w.days) for (const ex of dy.exercises) {
+		if (ex.lift && (ex.for === "both" || ex.for === person)) s.add(ex.lift);
+	}
 	return [...s].sort();
 }
 

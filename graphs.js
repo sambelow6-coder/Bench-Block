@@ -3,11 +3,28 @@
 
 "use strict";
 
-const CH = { w: 340, h: 190, l: 38, r: 10, t: 12, b: 34 };
+const CH = { w: 340, h: 208, l: 46, r: 12, t: 14, b: 46 };
 
 function chartFrame(inner, note) {
 	return `<svg viewBox="0 0 ${CH.w} ${CH.h}" class="chart" role="img">${inner}</svg>`
 		+ (note ? `<div class="chart-note">${note}</div>` : "");
+}
+
+function emptyState(msg) {
+	return `<div class="chart-empty">${esc(msg || "nothing logged for this yet")}</div>`;
+}
+
+/* Axis captions. Without these a reader has to guess what the numbers are. */
+function axisLabels(yLabel, xLabel) {
+	let g = "";
+	if (yLabel) {
+		const cy = CH.t + (CH.h - CH.t - CH.b) / 2;
+		g += `<text class="axlab" x="11" y="${cy.toFixed(1)}" text-anchor="middle" transform="rotate(-90 11 ${cy.toFixed(1)})">${esc(yLabel)}</text>`;
+	}
+	if (xLabel) {
+		g += `<text class="axlab" x="${(CH.l + (CH.w - CH.l - CH.r) / 2).toFixed(1)}" y="${CH.h - 6}" text-anchor="middle">${esc(xLabel)}</text>`;
+	}
+	return g;
 }
 
 function scaleY(vals, zeroBase) {
@@ -52,7 +69,8 @@ function fmtTick(v) {
 	const a = Math.abs(v);
 	if (a >= 10000) return Math.round(v / 1000) + "k";
 	if (a >= 1000) return (v / 1000).toFixed(1) + "k";
-	return a >= 10 || v === 0 ? String(Math.round(v)) : v.toFixed(1);
+	if (Number.isInteger(v)) return String(v);      // counts read as 1, not 1.0
+	return a >= 10 ? String(Math.round(v)) : v.toFixed(1);
 }
 
 function shortDate(d) { return d.slice(5).replace("-", "/"); }
@@ -60,10 +78,10 @@ function shortDate(d) { return d.slice(5).replace("-", "/"); }
 /* One or more line series over shared categorical x positions. */
 function lineChart(series, xLabels, opts) {
 	opts = opts || {};
-    const all = series.flatMap(s => s.pts.map(p => p.y));
+	const all = series.flatMap(s => s.pts.map(p => p.y));
 	const sc = scaleY(all, opts.zeroBase);
-	if (!sc) return `<div class="chart-empty">no data yet</div>`;
-	let g = axes(sc, xLabels, opts.everyNth);
+	if (!sc || !all.some(v => v != null && isFinite(v))) return emptyState(opts.emptyMsg);
+	let g = axes(sc, xLabels, opts.everyNth) + axisLabels(opts.yLabel, opts.xLabel);
 	series.forEach((s, si) => {
 		const cls = s.cls || ("c" + (si % 6 + 1));
 		let d = "", open = false;
@@ -74,10 +92,19 @@ function lineChart(series, xLabels, opts) {
 			open = true;
 		});
 		g += `<path class="ln ${cls}" d="${d.trim()}"/>`;
+		let last = -1;
 		s.pts.forEach((p, i) => {
 			if (p.y == null) return;
+			last = i;
 			g += `<circle class="dot ${cls}" cx="${xPix(i, s.pts.length).toFixed(1)}" cy="${yPix(p.y, sc).toFixed(1)}" r="2.6"/>`;
 		});
+		// call out the newest value; it's the one being read for a decision
+		if (last >= 0 && opts.labelLast !== false) {
+			const p = s.pts[last];
+			const x = xPix(last, s.pts.length), y = yPix(p.y, sc);
+			const flip = x > CH.w - CH.r - 26;
+			g += `<text class="ptlab ${cls}" x="${(x + (flip ? -5 : 5)).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="${flip ? "end" : "start"}">${fmtTick(p.y)}</text>`;
+		}
 	});
 	return chartFrame(g, opts.note);
 }
@@ -86,9 +113,12 @@ function lineChart(series, xLabels, opts) {
 function comboChart(groups, bars, line, opts) {
 	opts = opts || {};
 	const barVals = groups.flatMap(g => g.values.filter(v => v != null));
+	const lineVals = line ? line.pts.map(p => p.y).filter(v => v != null) : [];
+	if (!barVals.some(v => v !== 0) && !lineVals.length) return emptyState(opts.emptyMsg);
 	const bsc = scaleY(barVals.length ? barVals : [0], true);
-	let g = axes(bsc, groups.map(x => x.label), opts.everyNth);
+	let g = axes(bsc, groups.map(x => x.label), opts.everyNth) + axisLabels(opts.yLabel, opts.xLabel);
 	const plotB = CH.h - CH.b;
+	const labelBars = groups.length * Math.max(bars.length, 1) <= 10;
 	const slot = (CH.w - CH.l - CH.r) / Math.max(groups.length, 1);
 	const bw = Math.max(3, slot / Math.max(bars.length, 1) * 0.62);
 	groups.forEach((grp, gi) => {
@@ -97,6 +127,7 @@ function comboChart(groups, bars, line, opts) {
 			const cx = CH.l + slot * (gi + 0.5) + (bi - (bars.length - 1) / 2) * bw * 1.08;
 			const y = yPix(v, bsc);
 			g += `<rect class="bar ${bars[bi].cls}" x="${(cx - bw / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, plotB - y).toFixed(1)}" rx="1.5"/>`;
+			if (labelBars) g += `<text class="barlab" x="${cx.toFixed(1)}" y="${(y - 3.5).toFixed(1)}" text-anchor="middle">${fmtTick(v)}</text>`;
 		});
 	});
 	if (line && line.pts.some(p => p.y != null)) {
@@ -119,13 +150,13 @@ function comboChart(groups, bars, line, opts) {
 
 function scatterChart(pts, opts) {
 	opts = opts || {};
-	if (!pts.length) return `<div class="chart-empty">no data yet</div>`;
+	if (!pts.length) return emptyState(opts.emptyMsg);
 	const ysc = scaleY(pts.map(p => p.y), true);
 	const xs = pts.map(p => p.x);
 	let xlo = 0, xhi = Math.max(...xs, 1);
 	xhi = xhi + (xhi - xlo) * 0.12;
 	const plotB = CH.h - CH.b;
-	let g = axes(ysc, [], 1);
+	let g = axes(ysc, [], 1) + axisLabels(opts.yLabel, opts.xLabel);
 	for (let i = 0; i <= 3; i++) {
 		const v = xlo + (xhi - xlo) * (i / 3);
 		const x = CH.l + (CH.w - CH.l - CH.r) * (i / 3);
@@ -177,29 +208,35 @@ function renderGraphs() {
 		const s = e1rmWeekly(person, graphLift);
 		const filled = s.filter(p => p.y != null).length;
 		html += card("Estimated 1RM — " + graphLift, "best set of each week · Epley with RPE spent as reps in reserve",
-			pick + lineChart([{ pts: s, cls: "c1" }], s.map(p => shortDate(p.x)),
-				{ note: filled < 2 ? "one week in — this becomes a trend from week 2" : null }));
+			pick + lineChart([{ pts: s, cls: "c1" }], s.map(p => shortDate(p.x)), {
+				yLabel: "est. 1RM (lb)", xLabel: "week beginning",
+				emptyMsg: "needs weight + reps + RPE on a set — log a weight and this fills in",
+				note: filled === 1 ? "one week in — this becomes a trend from week 2" : null
+			}));
 	}
 
-	// 2. volume against progress: tonnage and hard sets kept on their own axes
-	// rather than fudged onto one, then read against the same e1RM line
+	// 2. volume against progress: tonnage and hard sets keep their own axes
+	// rather than being fudged onto one
 	const load = weeklyLiftLoad(person, graphLift);
-	html += card("Volume vs progress — " + graphLift, "weekly tonnage (bars) against best e1RM that week (line)",
+	html += card("Volume vs progress — " + (graphLift || "—"), "is more work actually buying strength?",
 		comboChart(
 			load.map(r => ({ label: shortDate(r.week), values: [r.tonnage] })),
 			[{ cls: "c2" }],
-			{ pts: load.map(r => ({ y: r.best })), cls: "c1" }
-		) + legend([{ cls: "c2", label: "tonnage (lb)" }, { cls: "c1", label: "best e1RM" }])
-		+ `<div class="graph-sub" style="margin-top:12px">Hard sets per week (RPE ≥ 7)</div>`
-		+ comboChart(load.map(r => ({ label: shortDate(r.week), values: [r.hardSets] })), [{ cls: "c3" }], null));
+			{ pts: load.map(r => ({ y: r.best })), cls: "c1" },
+			{ yLabel: "tonnage (lb)", xLabel: "week beginning", emptyMsg: "no weights logged for " + (graphLift || "this lift") + " yet" }
+		) + legend([{ cls: "c2", label: "weekly tonnage — weight × reps, all sets" }, { cls: "c1", label: "best e1RM that week" }])
+		+ `<div class="graph-sub sub-head">Hard sets per week — sets taken at RPE 7 or above</div>`
+		+ comboChart(load.map(r => ({ label: shortDate(r.week), values: [r.hardSets] })), [{ cls: "c3" }], null,
+			{ yLabel: "hard sets", xLabel: "week beginning", emptyMsg: "no sets at RPE 7+ yet" }));
 
 	// 3. RPE drift at fixed %
 	const drift = rpeDrift(person, graphLift);
 	if (drift.length) {
 		const weeks = drift[0].pts.map(p => shortDate(p.x));
-		html += card("RPE drift at fixed %", "same prescribed load, week over week · falling = stronger, climbing = deload",
-			lineChart(drift.map((d, i) => ({ pts: d.pts, cls: "c" + (i % 6 + 1) })), weeks, {})
-			+ legend(drift.map((d, i) => ({ cls: "c" + (i % 6 + 1), label: d.pct + "%" }))));
+		html += card("RPE drift at fixed %", "the same prescribed load, week over week · falling = getting stronger, climbing = time to deload",
+			lineChart(drift.map((d, i) => ({ pts: d.pts, cls: "c" + (i % 6 + 1) })), weeks,
+				{ yLabel: "average RPE", xLabel: "week beginning", emptyMsg: "needs two weeks at the same prescribed %" })
+			+ legend(drift.map((d, i) => ({ cls: "c" + (i % 6 + 1), label: d.pct + "% of max" }))));
 	}
 
 	// 4. knee dose-response (Manny)
@@ -212,33 +249,38 @@ function renderGraphs() {
 		const base = rest.length ? (rest.reduce((s, k) => s + k.y, 0) / rest.length).toFixed(1) : null;
 		let note = dosed.length < 5 ? "a handful of points is a hint, not a curve" : "";
 		if (base != null) note += (note ? " · " : "") + "baseline after non-leg days: " + base + " (" + rest.length + " mornings)";
-		html += card("Knee: next morning vs previous day's leg load", "x = leg tonnage the day before · y = morning knee score",
-			scatterChart(dosed, { note }));
+		html += card("Knee dose-response", "each dot is one morning after a leg day · further right = heavier the day before, higher = angrier knee",
+			scatterChart(dosed, { yLabel: "morning knee 0–5", xLabel: "leg tonnage the day before (lb)", note, emptyMsg: "no morning check-in yet that followed a leg day" }));
 		const line = checkinSeries(person, "knee_am");
-		html += card("Knee score over time", "the gate: worse next morning means the dose was too high",
-			lineChart([{ pts: line, cls: "c4" }], line.map(p => shortDate(p.x)), { zeroBase: true }));
+		html += card("Knee score over time", "the gate: worse the next morning means the dose was too high",
+			lineChart([{ pts: line, cls: "c4" }], line.map(p => shortDate(p.x)),
+				{ zeroBase: true, yLabel: "morning knee 0–5", xLabel: "date", emptyMsg: "no morning knee check-ins logged yet" }));
 	}
 
 	// 5. hard sets per muscle
 	const mus = weeklyMuscleSets(person);
 	if (mus.muscles.length) {
-		html += card("Hard sets per muscle per week", "RPE ≥ 7 · a set counts toward every muscle it trains, so totals overlap",
+		html += card("Hard sets per muscle per week", "RPE ≥ 7 only · a set counts toward every muscle it trains, so the bars deliberately add up to more than your total sets",
 			comboChart(
 				mus.weeks.map((w, wi) => ({ label: shortDate(w), values: mus.muscles.map(m => m.counts[wi]) })),
 				mus.muscles.map((m, i) => ({ cls: "c" + (i % 6 + 1) })),
-				null
+				null,
+				{ yLabel: "hard sets", xLabel: "week beginning", emptyMsg: "no sets at RPE 7+ yet" }
 			) + legend(mus.muscles.map((m, i) => ({ cls: "c" + (i % 6 + 1), label: m.name }))));
 	}
 
 	// 6. sleep vs session quality (weekly averages)
 	const sq = weeklySleepQuality(person);
 	if (sq.some(r => r.sleep != null || r.quality != null)) {
-		html += card("Sleep vs session quality", "weekly averages · hours in bed against how sessions felt",
+		html += card("Sleep vs session quality", "weekly averages · days with nothing entered are skipped, never counted as zero",
 			lineChart([
 				{ pts: sq.map(r => ({ x: r.week, y: r.sleep })), cls: "c5" },
 				{ pts: sq.map(r => ({ x: r.week, y: r.quality })), cls: "c1" }
-			], sq.map(r => shortDate(r.week)), { zeroBase: true, note: "two people and a few weeks is not enough to call a correlation real" })
-			+ legend([{ cls: "c5", label: "avg hours in bed" }, { cls: "c1", label: "avg session 1–5" }]));
+			], sq.map(r => shortDate(r.week)), {
+				zeroBase: true, yLabel: "hours / rating", xLabel: "week beginning",
+				note: "two people over a few weeks is not enough to call a correlation real"
+			})
+			+ legend([{ cls: "c5", label: "avg hours in bed" }, { cls: "c1", label: "avg session rating 1–5" }]));
 	}
 
 	// 7. bodyweight and relative strength
@@ -246,21 +288,26 @@ function renderGraphs() {
 	if (bw.length) {
 		const byDate = new Map(e1rmSeries(person, graphLift).map(p => [p.x, p.y]));
 		const rel = bw.map(p => ({ x: p.x, y: byDate.has(p.x) ? +(byDate.get(p.x) / p.y).toFixed(2) : null }));
-		html += card("Bodyweight", "and " + graphLift + " e1RM per pound of you, where both were logged the same day",
-			lineChart([{ pts: bw, cls: "c6" }], bw.map(p => shortDate(p.x)), {})
+		html += card("Bodyweight", "with relative strength underneath, on days both were logged",
+			lineChart([{ pts: bw, cls: "c6" }], bw.map(p => shortDate(p.x)),
+				{ yLabel: "bodyweight (lb)", xLabel: "date" })
 			+ (rel.some(r => r.y != null)
-				? lineChart([{ pts: rel, cls: "c1" }], rel.map(p => shortDate(p.x)), { note: "e1RM ÷ bodyweight" })
-				: ""));
+				? `<div class="graph-sub sub-head">Relative strength — ${esc(graphLift)} e1RM per pound of you</div>`
+					+ lineChart([{ pts: rel, cls: "c1" }], rel.map(p => shortDate(p.x)),
+						{ yLabel: "e1RM ÷ bodyweight", xLabel: "date" })
+				: `<div class="chart-note">relative strength needs a bodyweight and a weighted ${esc(graphLift)} set on the same day</div>`));
 	}
 
 	// 8. adherence
 	const adh = adherence(person);
 	if (adh.length) {
-		html += card("Adherence", "sets completed against sets prescribed",
+		html += card("Adherence", "how much of the written program actually got done",
 			comboChart(
 				adh.map(r => ({ label: shortDate(r.week), values: [r.prescribed, r.done] })),
-				[{ cls: "c3" }, { cls: "c2" }], null
-			) + legend([{ cls: "c3", label: "prescribed" }, { cls: "c2", label: "completed" }])
+				[{ cls: "c3" }, { cls: "c2" }], null,
+				{ yLabel: "sets", xLabel: "week beginning" }
+			) + legend([{ cls: "c3", label: "sets prescribed" }, { cls: "c2", label: "sets completed" }])
+			+ adh.map(r => `<div class="adh-line">wk of ${shortDate(r.week)} — <b>${r.done} of ${r.prescribed} sets</b> (${Math.round(r.done / r.prescribed * 100)}%)${r.skippedSets ? ", " + r.skippedSets + " skipped" : ""}${r.skippedDays ? ", " + r.skippedDays + " day off-plan" : ""}</div>`).join("")
 			+ (adh.some(r => r.reasons.length)
 				? `<div class="reasons">${adh.filter(r => r.reasons.length).map(r =>
 					`<div class="reason-wk">wk of ${shortDate(r.week)}</div>` +
@@ -280,6 +327,37 @@ function renderGraphs() {
 
 /* ---------- program view ---------- */
 
+/* The shape of the prescription without the weights, which change every week.
+   Built from the structured fields, never parsed back out of the rx text. */
+function schemeLine(ex) {
+	const bits = [];
+	const raw = String((typeof ex.rx === "string" ? ex.rx : (ex.rx ? ex.rx[prog.people[0]] : "")) || "");
+	const reps = ex.reps;
+
+	if (ex.timed) {
+		const dur = raw.match(/\d+\s*(?:sec|min)\b/i);
+		bits.push(ex.sets + " × " + (dur ? dur[0] : "") + " holds");
+	} else if (ex.amrap) bits.push(ex.sets + " × AMRAP");
+	else if (reps && typeof reps === "object") {
+		bits.push(ex.sets + " sets · " + prog.people.filter(p => reps[p] != null).map(p => p + " " + reps[p]).join(" / ") + " reps");
+	} else if (reps != null) bits.push(ex.sets + "×" + reps);
+	else bits.push(ex.sets + " sets");
+
+	const pct = ex.pct;
+	if (pct && typeof pct === "object") {
+		const parts = prog.people.filter(p => pct[p] != null).map(p => pct[p] + "% (" + p + ")");
+		if (parts.length) bits.push(parts.join(", ") + (parts.length < prog.people.length ? ", RPE for the rest" : ""));
+	} else if (pct != null) bits.push(pct + "% of max");
+	else bits.push("by RPE");
+
+	// keep the coaching cues from the rx text; drop loads, rep schemes and durations
+	const cue = raw.split("·").map(s => s.trim()).filter(s =>
+		s && !/lb|%\)/.test(s) && !/^\d+\s*×/.test(s) && !/^\d+ sets/.test(s) && !/^RPE/.test(s) && !/^\d+\s*(?:sec|min)\b/i.test(s)
+	);
+	if (cue.length) bits.push(cue.join(" · "));
+	return bits.join(" · ");
+}
+
 function renderProgramView() {
 	el("checkin-slot").innerHTML = "";
 	const w = weekDef();
@@ -295,13 +373,14 @@ function renderProgramView() {
 	for (const day of w.days) {
 		html += `<div class="card">
 			<div class="graph-title">${day.key.toUpperCase()} — ${esc(day.title)}</div>
-			${day.exercises.map(ex => {
+			${day.exercises.length ? day.exercises.map(ex => {
 				const mine = ex.for === "both" || ex.for === person;
 				return `<div class="prog-ex ${mine ? "" : "not-yours"}">
-					<div class="prog-ex-name">${esc(ex.name)}${ex.tags ? `<span class="tags">${ex.tags.map(t => esc(t)).join(" · ")}</span>` : ""}</div>
-					${rxLines(ex)}
+					<div class="prog-ex-name">${esc(ex.name)}${ex.for !== "both" ? `<span class="rx-tag ${ex.for}"> ${ex.for.toUpperCase()} ONLY</span>` : ""}</div>
+					<div class="prog-scheme">${esc(schemeLine(ex))}</div>
+					${ex.tags ? `<div class="tags">${ex.tags.map(t => esc(t)).join(" · ")}</div>` : ""}
 				</div>`;
-			}).join("")}
+			}).join("") : `<div class="prog-scheme">No lifting — morning check-in only (sleep, bodyweight, and the ${person === "manny" ? "knee" : "back"} score).</div>`}
 		</div>`;
 	}
 

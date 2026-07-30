@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v1.8";
+const APP_VERSION = "v1.9";
 
 /* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
    browser cannot read a success response. Hence no-cors, "resend everything"
