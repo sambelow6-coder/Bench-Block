@@ -1,5 +1,5 @@
 {
-	"program_version": 8,
+	"program_version": 9,
 	"meso": "Mesocycle 1 — Bench Focus",
 	"title": "Bench Block 1",
 	"current_week": 2,
@@ -168,7 +168,7 @@
 						  "rx": { "sam": "245 lb — 4×6 · RPE 7–8 · hold — set 3 was a 9 last week", "manny": "4×6 · RPE 7–8 · add 10–15 lb — you called last week easy on weight AND volume" } },
 						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
 						{ "id": "oa_row", "for": "both", "sets": 3, "reps": 10,
-						  "rx": { "sam": "135–160 lb — 3×10 · RPE 7–8 · braced on bench (lawnmower)", "manny": "3×10 · RPE 7–8 · you flagged it heavy — drop ~10% · braced on bench (lawnmower)" } },
+						  "rx": { "sam": "3×10 · RPE 7–8 · DB lawnmower, or the chest-supported machine row you subbed (that's where your 135–160 lives)", "manny": "3×10 · RPE 7–8 · you flagged it heavy — drop ~10% · braced on bench (lawnmower)" } },
 						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 7–8" }
 					]
 				},
