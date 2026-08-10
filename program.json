@@ -1,8 +1,8 @@
 {
-	"program_version": 7,
+	"program_version": 8,
 	"meso": "Mesocycle 1 — Bench Focus",
 	"title": "Bench Block 1",
-	"current_week": 1,
+	"current_week": 2,
 	"people": ["sam", "manny"],
 	"maxes": { "sam": { "bench": 315, "squat": 365, "deadlift": 425 }, "manny": { "bench": 335 } },
 	"rules": [
@@ -118,15 +118,89 @@
 		{
 			"week": 2,
 			"week_of": "2026-08-10",
-			"label": "filler preview — real week 2 comes from the check-in",
 			"days": [
 				{
 					"key": "mon", "title": "Heavy Bench",
 					"exercises": [
-						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": 80,
-						  "rx": { "sam": "250 lb — 3×5 (80%) · RPE 7–8", "manny": "270 lb — 3×5 (80%) · RPE 7–8" } },
+						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": 82.5,
+						  "rx": { "sam": "260 lb — 3×5 (82.5%) · RPE 7–8", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8" } },
 						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": 72.5,
-						  "rx": { "sam": "230 lb — 2×8 (72.5%)", "manny": "245 lb — 2×8 (72.5%)" } },
+						  "rx": { "sam": "230 lb — 2×6–8 (72.5%) · end the set at RPE 8.5 — last week set 2 ran to 9.5", "manny": "245 lb — 2×8 (72.5%)" } },
+						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10,
+						  "rx": { "sam": "115 lb — 3×10 · RPE 7–8 · you flagged it heavy; 110 is fine if set 3 passes 8", "manny": "3×10 · RPE 7–8" } },
+						{ "id": "lat_pulldown", "for": "both", "sets": 3, "reps": 10,
+						  "rx": { "sam": "145 lb — 3×10 · RPE 7–8", "manny": "3×10 · RPE 7–8" } },
+						{ "id": "cable_pushdown", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8 · Sam: machine press sub fine, your 9–10 here is licensed" }
+					]
+				},
+				{
+					"key": "tue", "title": "Legs",
+					"exercises": [
+						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 75, "rx": "275 lb — 3×5 (75%) · cap RPE 7 · real ramp — the 315×3 said the back is ready" },
+						{ "id": "leg_press", "for": "sam", "sets": 3, "reps": 10, "rx": "235 lb — 3×10 · RPE 7" },
+						{ "id": "ham_curl", "for": "sam", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8 · leg extension swap OK if the curls are taken again" },
+						{ "id": "spanish_squat", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · you called it easy — hold a DB/plate goblet-style this week · opens the session" },
+						{ "id": "hsr_leg_press", "for": "manny", "sets": 4, "reps": 8, "rx": "4×8 · RPE 6–7 · add 10–20 lb from last week ('easy') · keep the strict 3 sec down / 3 sec up" },
+						{ "id": "leg_extension", "for": "manny", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
+						{ "id": "core", "for": "both", "sets": 3, "rx": "3 sets · your pick" }
+					]
+				},
+				{
+					"key": "wed", "title": "Volume Bench",
+					"exercises": [
+						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": { "sam": 77.5, "manny": 75 },
+						  "rx": { "sam": "245 lb — 4×6 (77.5%) · RPE 7–8 · ratifying last week's overshoot — it sat in the window", "manny": "250 lb — 4×6 (75%) · RPE 7–8" } },
+						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": { "sam": 8, "manny": 10 },
+						  "rx": { "sam": "185 lb — 3×8 · STOP at RPE 8 — last week set 3 was a 10", "manny": "3×8–10 · RPE 7–8 (OHP swap OK)" } },
+						{ "id": "cable_row", "for": "both", "sets": 3, "reps": 10,
+						  "rx": { "sam": "160 lb — 3×10 · RPE 7–8", "manny": "3×10 · RPE 7–8" } },
+						{ "id": "curls", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" },
+						{ "id": "machine_dip", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · push to RPE 9–10 if you like" }
+					]
+				},
+				{
+					"key": "thu", "title": "Rest — check-in only", "exercises": []
+				},
+				{
+					"key": "fri", "title": "Variation",
+					"exercises": [
+						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6,
+						  "rx": { "sam": "245 lb — 4×6 · RPE 7–8 · hold — set 3 was a 9 last week", "manny": "4×6 · RPE 7–8 · add 10–15 lb — you called last week easy on weight AND volume" } },
+						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
+						{ "id": "oa_row", "for": "both", "sets": 3, "reps": 10,
+						  "rx": { "sam": "135–160 lb — 3×10 · RPE 7–8 · braced on bench (lawnmower)", "manny": "3×10 · RPE 7–8 · you flagged it heavy — drop ~10% · braced on bench (lawnmower)" } },
+						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 7–8" }
+					]
+				},
+				{
+					"key": "sat", "title": "Moderate Bench + Pull",
+					"exercises": [
+						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 84, "manny": 77.5 },
+						  "rx": { "sam": "265 lb — 5×3 (84%) · RPE 6–7 · met you between the written 235 and your 275", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7" } },
+						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 81 },
+						  "rx": { "sam": "345 lb — 3×3 (81%) · cap RPE 7 · holding your number — flat 7s, back silent", "manny": "3×5 · RPE 6–7 · you logged discomfort — note WHERE it bites (knee? back?)" } },
+						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · same grip as last week (Sam: 9/7/7 to beat)" },
+						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×8–10 · RPE 7–8" },
+						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec · discomfort logged — keep it ≤3/10 or cut it" }
+					]
+				},
+				{
+					"key": "sun", "title": "Rest — check-in only", "exercises": []
+				}
+			]
+		},
+		{
+			"week": 3,
+			"week_of": "2026-08-17",
+			"label": "filler preview — real week 3 comes from the check-in",
+			"days": [
+				{
+					"key": "mon", "title": "Heavy Bench",
+					"exercises": [
+						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": 82.5,
+						  "rx": { "sam": "260 lb — 3×5 (82.5%) · RPE 7–8", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8" } },
+						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": 72.5,
+						  "rx": { "sam": "230 lb — 2×6–8 (72.5%)", "manny": "245 lb — 2×8 (72.5%)" } },
 						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "lat_pulldown", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "cable_pushdown", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" }
@@ -135,7 +209,7 @@
 				{
 					"key": "tue", "title": "Legs",
 					"exercises": [
-						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 70, "rx": "255 lb — 3×5 (70%) · cap RPE 7" },
+						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 75, "rx": "275 lb — 3×5 (75%) · cap RPE 7" },
 						{ "id": "leg_press", "for": "sam", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7" },
 						{ "id": "ham_curl", "for": "sam", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
 						{ "id": "spanish_squat", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · hard effort · opens the session" },
@@ -147,8 +221,8 @@
 				{
 					"key": "wed", "title": "Volume Bench",
 					"exercises": [
-						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": 72.5,
-						  "rx": { "sam": "230 lb — 4×6 (72.5%) · RPE 7–8", "manny": "245 lb — 4×6 (72.5%) · RPE 7–8" } },
+						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": { "sam": 77.5, "manny": 75 },
+						  "rx": { "sam": "245 lb — 4×6 (77.5%) · RPE 7–8", "manny": "250 lb — 4×6 (75%) · RPE 7–8" } },
 						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": 10, "rx": "3×8–10 · RPE 7–8 (OHP swap OK)" },
 						{ "id": "cable_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "curls", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" },
@@ -170,12 +244,12 @@
 				{
 					"key": "sat", "title": "Moderate Bench + Pull",
 					"exercises": [
-						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": 75,
-						  "rx": { "sam": "235 lb — 5×3 (75%) · RPE 6–7", "manny": "250 lb — 5×3 (75%) · RPE 6–7" } },
-						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 75 },
-						  "rx": { "sam": "320 lb — 3×3 (75%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
+						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 84, "manny": 77.5 },
+						  "rx": { "sam": "265 lb — 5×3 (84%) · RPE 6–7", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7" } },
+						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 81 },
+						  "rx": { "sam": "345 lb — 3×3 (81%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
 						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
-						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
+						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×8–10 · RPE 7–8" },
 						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
 					]
 				},
