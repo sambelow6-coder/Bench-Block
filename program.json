@@ -1,13 +1,13 @@
 {
-	"program_version": 10,
+	"program_version": 11,
 	"meso": "Mesocycle 1 — Bench Focus",
 	"title": "Bench Block 1",
 	"current_week": 3,
 	"people": ["sam", "manny"],
 	"maxes": { "sam": { "bench": 315, "squat": 365, "deadlift": 425 }, "manny": { "bench": 335 } },
 	"rules": [
-		"Main-lift RPE window 7–8 (Sat 6–7). Over the window on set 1 → drop 5%, finish, log it.",
-		"Under the window → finish as written, tap 'weight: easy', ramp comes next week.",
+		"Main-lift RPE window 7–8 (Fri triples 6–7). Set 1 at the written weight — that's the coach's fixed-% reading — then adjust in 5–10 lb steps to sit in the window. Log every weight.",
+		"Over the window on set 1 → drop 5%. Under it → step up, and tap 'weight: easy' so the written number moves next week.",
 		"No weight/RPE logged = the number holds next week. Can't ramp what I can't see.",
 		"Second-press compounds (back-off, incline, close-grip) cap at RPE 8. Isolation finishers at 9–10 are licensed.",
 		"Manny gate: next-morning knee must be ≤ baseline or the dose was too high.",
@@ -22,7 +22,7 @@
 		"bench_heavy":     { "name": "Comp Bench — heavy",    "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
 		"bench_backoff":   { "name": "Comp Bench — back-off", "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
 		"bench_volume":    { "name": "Comp Bench — volume",   "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
-		"bench_moderate":  { "name": "Comp Bench — moderate", "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
+		"bench_moderate":  { "name": "Comp Bench — triples",  "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
 		"cg_bench":        { "name": "Close-Grip Bench",      "lift": "close-grip bench", "tags": ["triceps", "chest", "front delt"] },
 		"incline_bb":      { "name": "Incline Barbell Press", "lift": "incline bench",    "tags": ["chest", "front delt", "triceps"] },
 		"squat":           { "name": "Squat",                 "lift": "squat",            "tags": ["quads", "glutes", "hams"] },
@@ -199,7 +199,7 @@
 					"key": "mon", "title": "Heavy Bench",
 					"exercises": [
 						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": { "sam": 85, "manny": 82.5 },
-						  "rx": { "sam": "270 lb — 3×5 (85%) · RPE 7–8 · block ramp; your 275×5 was an 8, so 270 flat should run 7→8 · no 260@5→275 zig-zag: if set 1 reads ≤6, add 5 next set, not 15", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8 · HELD — nothing has reached me since Aug 9, so I can't ramp you · if you remember last week's set 1 at ≤7, take 285 · log weight + RPE this time" } },
+						  "rx": { "sam": "270 lb — 3×5 (85%) · RPE 7–8 · set 1 at 270 (that's my fixed-% reading), then adjust in 5–10 lb steps to sit in the window — your read is good, just log every weight", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8 · HELD — nothing has reached me since Aug 9, so I can't ramp you · if you remember last week's set 1 at ≤7, take 285 · log weight + RPE this time" } },
 						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": { "sam": 75, "manny": 72.5 },
 						  "rx": { "sam": "235 lb — 2×6–8 (75%) · end the set at RPE 8.5 · 230 went 8/8 @8/8.5, so +5", "manny": "245 lb — 2×8 (72.5%)" } },
 						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10,
@@ -241,12 +241,12 @@
 					"key": "thu", "title": "Rest — check-in only", "exercises": []
 				},
 				{
-					"key": "fri", "title": "Variation",
+					"key": "fri", "title": "Bench Triples",
 					"exercises": [
-						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6,
-						  "rx": { "sam": "255 lb — 4×6 · RPE 7–8 · hold — you took 255 last week and it sat 7.5→8; third week, don't add", "manny": "4×6 · RPE 7–8 · same weight as last week — LOG it · +5 if all four sets were ≤7" } },
+						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 90.5, "manny": 77.5 },
+						  "rx": { "sam": "285 lb — 5×3 (90.5%) · RPE 6–7 · moved here off the Thursday rest so the triples are fresh — 275 was 6/6/6.5/7/7 the day after close-grip · set 1 a 6 → 290 for the rest; set 1 over 7 → 280", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7 · held (no log) · 270 if last week's sets were 6s" } },
 						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12,
-						  "rx": { "sam": "3×12 · RPE 7–8 · if energy's gone again this is the right one to cut — you called it right", "manny": "3×12 · RPE 7–8" } },
+						  "rx": { "sam": "3×12 · RPE 7–8 · if energy's gone, this is still the right one to cut", "manny": "3×12 · RPE 7–8" } },
 						{ "id": "machine_row", "for": "sam", "sets": 3, "reps": 10, "rx": "170 lb — 3×10 · RPE 7–8 · 160 went 7/7.5/8 → +10 · your Friday row has its own history from here (DB lawnmower only if it's taken)" },
 						{ "id": "oa_row", "for": "manny", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower) · the −10% stands until I see a weight" },
 						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15,
@@ -254,10 +254,10 @@
 					]
 				},
 				{
-					"key": "sat", "title": "Moderate Bench + Pull",
+					"key": "sat", "title": "Close-Grip + Pull",
 					"exercises": [
-						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 87.5, "manny": 77.5 },
-						  "rx": { "sam": "275 lb — 5×3 (87.5%) · RPE 6–7 · ratified — 6/6/6.5/7/7 is exactly Saturday's job · hold, don't chase 285", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7 · held (no log) · 270 if last week's sets were 6s" } },
+						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6,
+						  "rx": { "sam": "255 lb — 4×6 · RPE 7–8 · now the day AFTER the triples — hold 255; if set 1 is over 8, 245 · this is the day that absorbs the fatigue, not the triples", "manny": "4×6 · RPE 7–8 · same weight as last week — LOG it · +5 if all four sets were ≤7" } },
 						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 86 },
 						  "rx": { "sam": "365 lb — 3×3 (86%) · cap RPE 7 · 345 was flat 6s and you flagged easy → +20 · if set 1 reads over 7, back to 345 for sets 2–3", "manny": "3×5 · RPE 6–7 · still need to know WHERE the discomfort bites — ✎ note it · knee → RDL 3×6 instead (hips back, knees soft) · back → skip it" } },
 						{ "id": "pullups", "for": "both", "sets": 3,
@@ -316,9 +316,10 @@
 					"key": "thu", "title": "Rest — check-in only", "exercises": []
 				},
 				{
-					"key": "fri", "title": "Variation",
+					"key": "fri", "title": "Bench Triples",
 					"exercises": [
-						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
+						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 90.5, "manny": 77.5 },
+						  "rx": { "sam": "285 lb — 5×3 (90.5%) · RPE 6–7", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7" } },
 						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
 						{ "id": "machine_row", "for": "sam", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "oa_row", "for": "manny", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
@@ -326,10 +327,9 @@
 					]
 				},
 				{
-					"key": "sat", "title": "Moderate Bench + Pull",
+					"key": "sat", "title": "Close-Grip + Pull",
 					"exercises": [
-						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 87.5, "manny": 77.5 },
-						  "rx": { "sam": "275 lb — 5×3 (87.5%) · RPE 6–7", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7" } },
+						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
 						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 86 },
 						  "rx": { "sam": "365 lb — 3×3 (86%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
 						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
