@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v2.0";
+const APP_VERSION = "v2.1";
 
 /* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
    browser cannot read a success response. Hence no-cors, "resend everything"
@@ -257,58 +257,66 @@ function renderTabs() {
 	});
 }
 
+/* The daily card belongs to the day you're LOOKING at, exactly like the sets
+   do — so sleep and bodyweight (and Manny's knee) are one value per day tab
+   and can be back-filled, instead of every tab showing one shared "today". */
 function renderCheckin() {
 	const slot = el("checkin-slot");
+	const date = dayDateStr(weekDef(), selectedDay);
+	const isToday = date === todayStr();
+	const when = isToday ? "today" : selectedDay.toUpperCase() + " " + date.slice(5);
 	const ci = (prog.checkins || []).find(c => c.person === person);
-	if (!ci) { slot.innerHTML = ""; return; }
-	const rec = findEntry({ type: "checkin", person, date: todayStr(), ex: ci.id });
-	const sleep = findEntry({ type: "sleep", person, date: todayStr() });
-	const bw = findEntry({ type: "bodyweight", person, date: todayStr() });
-	const noteBtn = `<button class="note-btn ${rec && rec.note ? "has-note" : ""}" data-ci-note="${ci.id}">✎</button>`;
-	slot.innerHTML = `
-		<div class="card checkin">
-			<div class="ex-name"><span class="ci-title">${esc(ci.label)} — ${todayStr() === dayDateStr(weekDef(), selectedDay) ? "today" : "today (" + todayStr().slice(5) + ")"}</span>${noteBtn}</div>
+	const rec = ci ? findEntry({ type: "checkin", person, date, ex: ci.id }) : null;
+	const sleep = findEntry({ type: "sleep", person, date });
+	const bw = findEntry({ type: "bodyweight", person, date });
+	const noteBtn = ci ? `<button class="note-btn ${rec && rec.note ? "has-note" : ""}" data-ci-note="${ci.id}">✎</button>` : "";
+	const scale = ci ? `
 			<div class="ci-hint">${esc(ci.hint)}</div>
 			<div class="scale-row">${[0, 1, 2, 3, 4, 5].map(n =>
 				`<button class="scale-btn ${rec && rec.rating === n ? "sel" : ""}" data-ci="${ci.id}" data-val="${n}">${n}</button>`
 			).join("")}</div>
-			${rec && rec.note ? `<div class="note-view">“${esc(rec.note)}”</div>` : ""}
-			<div class="ci-hint sleep-label">Sleep — hours in bed last night</div>
+			${rec && rec.note ? `<div class="note-view">“${esc(rec.note)}”</div>` : ""}` : "";
+	slot.innerHTML = `
+		<div class="card checkin">
+			<div class="ex-name"><span class="ci-title">${ci ? esc(ci.label) : "Daily check-in"} — ${when}</span>${noteBtn}</div>
+			${scale}
+			<div class="ci-hint sleep-label">Sleep — hours in bed ${isToday ? "last night" : "the night before " + when}</div>
 			<div class="sleep-row">
 				<input class="modal-input" id="sleep-input" type="number" step="0.5" min="0" max="24" inputmode="decimal" placeholder="7.5" value="${sleep && sleep.hours != null ? sleep.hours : ""}">
 				<button class="modal-btn primary" id="sleep-save">${sleep && sleep.hours != null ? "update" : "save"}</button>
 			</div>
-			<div class="ci-hint sleep-label">Bodyweight (lb) — if you have it</div>
+			<div class="ci-hint sleep-label">Bodyweight (lb) — ${isToday ? "this morning" : when}, if you have it</div>
 			<div class="sleep-row">
 				<input class="modal-input" id="bw-input" type="number" step="0.2" min="0" max="600" inputmode="decimal" placeholder="185" value="${bw && bw.lb != null ? bw.lb : ""}">
 				<button class="modal-btn primary" id="bw-save">${bw && bw.lb != null ? "update" : "save"}</button>
 			</div>
 		</div>`;
+	const forWhen = isToday ? "" : " for " + when;
 	slot.querySelectorAll("[data-ci]").forEach(b => {
 		b.onclick = () => {
-			upsert({ type: "checkin", person, date: todayStr(), ex: b.dataset.ci }, { exName: ci.label, rating: Number(b.dataset.val) });
+			upsert({ type: "checkin", person, date, ex: b.dataset.ci }, { exName: ci.label, rating: Number(b.dataset.val) });
 			renderCheckin(); renderFooter();
 		};
 	});
 	el("sleep-save").onclick = () => {
 		const v = parseFloat(el("sleep-input").value);
 		if (isNaN(v) || v < 0 || v > 24) { toast("Enter hours, e.g. 7.5", true); return; }
-		upsert({ type: "sleep", person, date: todayStr() }, { hours: v });
+		upsert({ type: "sleep", person, date }, { hours: v });
 		renderCheckin(); renderFooter();
-		toast("Sleep logged: " + v + " hrs");
+		toast("Sleep logged: " + v + " hrs" + forWhen);
 	};
 	el("bw-save").onclick = () => {
 		const v = parseFloat(el("bw-input").value);
 		if (isNaN(v) || v <= 0 || v > 600) { toast("Enter pounds, e.g. 185", true); return; }
-		upsert({ type: "bodyweight", person, date: todayStr() }, { lb: v });
+		upsert({ type: "bodyweight", person, date }, { lb: v });
 		renderCheckin(); renderFooter();
-		toast("Bodyweight logged: " + v + " lb");
+		toast("Bodyweight logged: " + v + " lb" + forWhen);
 	};
 	const nb = slot.querySelector("[data-ci-note]");
 	if (nb) nb.onclick = async () => {
 		const v = await noteModal(ci.label + " — note", rec && rec.note);
 		if (v === null) return;
-		upsert({ type: "checkin", person, date: todayStr(), ex: ci.id }, { exName: ci.label, note: v, rating: rec ? rec.rating : undefined });
+		upsert({ type: "checkin", person, date, ex: ci.id }, { exName: ci.label, note: v, rating: rec ? rec.rating : undefined });
 		renderCheckin(); renderFooter();
 	};
 }
