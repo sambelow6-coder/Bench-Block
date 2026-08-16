@@ -249,6 +249,11 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .prog-scheme { font-size: 13px; color: var(--dim); line-height: 1.5; }
 .prog-ex-name .rx-tag { font-size: 9px; }
 
+/* coach view — the week note reads like a message, exercise notes like margin notes */
+.coach-week { font-size: 13px; color: var(--ink); line-height: 1.55; white-space: pre-line; }
+.coach-note { font-size: 13px; color: var(--dim); line-height: 1.5; margin-top: 3px; }
+.coach-note.mine-line { color: var(--ink); }
+
 .toast {
 	position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
 	background: var(--good); color: #0d1d13; font-weight: 700; font-size: 13px;

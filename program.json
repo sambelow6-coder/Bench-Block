@@ -1,5 +1,5 @@
 {
-	"program_version": 11,
+	"program_version": 12,
 	"meso": "Mesocycle 1 — Bench Focus",
 	"title": "Bench Block 1",
 	"current_week": 3,
@@ -18,6 +18,7 @@
 	],
 
 	"__library_note": "Identity of a movement lives here ONCE: display name, which lift it pools into for e1RM, and the muscles it trains. Weeks carry only the prescription (sets/reps/pct/rx). Tagging a movement here retroactively re-tags every set ever logged against it.",
+	"__rx_note": "rx = the prescription only (weight — sets×reps (pct) · RPE window), string or {sam, manny}. It is what the LOG view shows in the gym, so keep it terse. why = the coach's reasoning for that exercise this week (optional, string or {sam, manny}); coach = the week's note. Both render on the COACH tab, never inside the workout.",
 	"library": {
 		"bench_heavy":     { "name": "Comp Bench — heavy",    "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
 		"bench_backoff":   { "name": "Comp Bench — back-off", "lift": "bench",            "tags": ["chest", "triceps", "front delt"] },
@@ -194,47 +195,65 @@
 		{
 			"week": 3,
 			"week_of": "2026-08-17",
+			"coach": "Week 3 of 4. Sam: your week-2 log ran heavier than written with the RPEs in the window, so the main lifts ramp (heavy 85%, volume 250, deadlift 365) and the third-week accessories hold — two fatigue flags (Wed 4/5, Fri \"energy really low\") are why. Fri/Sat swapped: the 5×3 stopped being a moderate day when it ran at 87%, so it moves to the fresh slot off the Thursday rest and close-grip absorbs the fatigue on Saturday. Back cleared — morning check retired.\nManny: nothing has reached the sheet from your phone since Aug 9, so every number holds at week 2 with a branch in the notes below. Log weight + RPE this week — open the app, then Send to Coach.",
 			"days": [
 				{
 					"key": "mon", "title": "Heavy Bench",
 					"exercises": [
 						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": { "sam": 85, "manny": 82.5 },
-						  "rx": { "sam": "270 lb — 3×5 (85%) · RPE 7–8 · set 1 at 270 (that's my fixed-% reading), then adjust in 5–10 lb steps to sit in the window — your read is good, just log every weight", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8 · HELD — nothing has reached me since Aug 9, so I can't ramp you · if you remember last week's set 1 at ≤7, take 285 · log weight + RPE this time" } },
+						  "rx": { "sam": "270 lb — 3×5 (85%) · RPE 7–8", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8" },
+						  "why": { "sam": "Block ramp 80 → 82.5 → 85%. Your 275×5 was an 8, so 270 flat should run 7 → 8. Set 1 at 270 is my fixed-% reading; after that adjust in 5–10 lb steps and log every weight — your in-session read is good.", "manny": "Held at week 2 — I can't ramp what I can't see. If you remember last week's set 1 at ≤7, take 285. Log weight + RPE this week or the number holds again." } },
 						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": { "sam": 75, "manny": 72.5 },
-						  "rx": { "sam": "235 lb — 2×6–8 (75%) · end the set at RPE 8.5 · 230 went 8/8 @8/8.5, so +5", "manny": "245 lb — 2×8 (72.5%)" } },
+						  "rx": { "sam": "235 lb — 2×6–8 (75%) · stop at RPE 8.5", "manny": "245 lb — 2×8 (72.5%)" },
+						  "why": { "sam": "230 went 8/8 @8/8.5, so +5. The 6–8 range absorbs set 2 instead of it reading as a failure." } },
 						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10,
-						  "rx": { "sam": "115 lb — 3×10 · RPE 7–8 · 110 (40 lb bar, noted) went 7/8/8 → +5", "manny": "3×10 · RPE 7–8" } },
+						  "rx": { "sam": "115 lb — 3×10 · RPE 7–8", "manny": "3×10 · RPE 7–8" },
+						  "why": { "sam": "110 (40 lb bar, noted) went 7/8/8 → +5." } },
 						{ "id": "lat_pulldown", "for": "both", "sets": 3, "reps": 10,
-						  "rx": { "sam": "150 lb — 3×10 · RPE 7–8 · 160 for one set then 145 zig-zagged; 150 flat across all three", "manny": "3×10 · RPE 7–8" } },
+						  "rx": { "sam": "150 lb — 3×10 · RPE 7–8", "manny": "3×10 · RPE 7–8" },
+						  "why": { "sam": "160 for one set then 145 zig-zagged; 150 flat across all three." } },
 						{ "id": "cable_pushdown", "for": "both", "sets": 3, "reps": 12,
-						  "rx": { "sam": "45 lb — 3×12–15 · RPE 8–9 · 42.5 was 8s flat; your 9–10 here is licensed", "manny": "3×10–12 · RPE 7–8" } }
+						  "rx": { "sam": "45 lb — 3×12–15 · RPE 8–9", "manny": "3×10–12 · RPE 7–8" },
+						  "why": { "sam": "42.5 was 8s flat. Your 9–10 on isolation finishers is licensed." } }
 					]
 				},
 				{
 					"key": "tue", "title": "Legs",
 					"exercises": [
-						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 78, "rx": "285 lb — 3×5 (78%) · cap RPE 7 · 275 was flat 7s → +10 · back cleared, morning check retired" },
-						{ "id": "leg_press", "for": "sam", "sets": 3, "reps": 10, "rx": "250 lb — 3×10 · RPE 7–8 · 235 was flat 7s → +15" },
-						{ "id": "ham_curl", "for": "sam", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8 · curl machine taken 2 for 2 → do it FIRST if it's free; leg extension 155 is the standing sub (145 went 7/8/8)" },
-						{ "id": "spanish_squat", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · goblet-weighted, same as last week · opens the session · knee ≤ baseline next morning = on track" },
-						{ "id": "hsr_leg_press", "for": "manny", "sets": 4, "reps": 8, "rx": "4×8 · RPE 6–7 · same weight as last week — LOG it · +10 only if every knee morning last week was ≤ baseline · strict 3 sec down / 3 sec up" },
-						{ "id": "leg_extension", "for": "manny", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 6 · slow + light · ≤3/10 discomfort OK" },
-						{ "id": "core", "for": "both", "sets": 3, "rx": "3 sets · your pick (Sam: deficit sit-ups counted)" }
+						{ "id": "squat", "for": "sam", "sets": 3, "reps": 5, "pct": 78, "rx": "285 lb — 3×5 (78%) · cap RPE 7",
+						  "why": "275 was flat 7s → +10. Back cleared, morning check retired." },
+						{ "id": "leg_press", "for": "sam", "sets": 3, "reps": 10, "rx": "250 lb — 3×10 · RPE 7–8",
+						  "why": "235 was flat 7s → +15." },
+						{ "id": "ham_curl", "for": "sam", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8 · or leg extension 155",
+						  "why": "Curl machine taken 2 for 2 — do it first if it's free. Leg extension is the standing sub (145 went 7/8/8)." },
+						{ "id": "spanish_squat", "for": "manny", "sets": 5, "rx": "5 × 45 sec holds · goblet-weighted · opens the session",
+						  "why": "Same as last week. Knee ≤ baseline the next morning = on track; if not, the dose was too high." },
+						{ "id": "hsr_leg_press", "for": "manny", "sets": 4, "reps": 8, "rx": "4×8 · RPE 6–7 · same weight as last week · 3 sec down / 3 sec up",
+						  "why": "LOG the weight. +10 only if every knee morning last week was ≤ baseline." },
+						{ "id": "leg_extension", "for": "manny", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 6 · slow + light",
+						  "why": "≤3/10 discomfort is OK on this one." },
+						{ "id": "core", "for": "both", "sets": 3, "rx": "3 sets · your pick",
+						  "why": { "sam": "Deficit sit-ups counted." } }
 					]
 				},
 				{
 					"key": "wed", "title": "Volume Bench",
 					"exercises": [
 						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": { "sam": 79.5, "manny": 75 },
-						  "rx": { "sam": "250 lb — 4×6 (79.5%) · RPE 7–8 · 245/255/255/245 went 6/7/8/8 → 250 flat, no mid-session ramp · set 4 stays ≤8", "manny": "250 lb — 4×6 (75%) · RPE 7–8 · held (no log) · 260 if last week's set 1 was ≤7" } },
+						  "rx": { "sam": "250 lb — 4×6 (79.5%) · RPE 7–8", "manny": "250 lb — 4×6 (75%) · RPE 7–8" },
+						  "why": { "sam": "245/255/255/245 went 6/7/8/8 → 250 flat; set 4 stays ≤8.", "manny": "Held (no log). 260 if last week's set 1 was ≤7." } },
 						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": { "sam": 8, "manny": 10 },
-						  "rx": { "sam": "190 lb — 3×6–8 · STOP at RPE 8 · 185×8 was 8/8/8, so +5 and the range absorbs set 3", "manny": "3×8–10 · RPE 7–8 (OHP swap OK)" } },
+						  "rx": { "sam": "190 lb — 3×6–8 · stop at RPE 8", "manny": "3×8–10 · RPE 7–8 (OHP swap OK)" },
+						  "why": { "sam": "185×8 was 8/8/8, so +5 and the range absorbs set 3. Second-press compounds cap at 8 — this is where week 1 fried you." } },
 						{ "id": "cable_row", "for": "both", "sets": 3, "reps": 10,
-						  "rx": { "sam": "150 lb — 3×10 · RPE 7–8 · you flagged 160 heavy at 8/8/8 → back inside the window; 155 if set 1 is a 7", "manny": "3×10 · RPE 7–8" } },
+						  "rx": { "sam": "150 lb — 3×10 · RPE 7–8", "manny": "3×10 · RPE 7–8" },
+						  "why": { "sam": "You flagged 160 heavy at 8/8/8 → back inside the window; 155 if set 1 is a 7." } },
 						{ "id": "curls", "for": "both", "sets": 3, "reps": 12,
-						  "rx": { "sam": "30s — 3×10–12 · RPE 7–8 · cut for time last week — right call, curls are the first thing to drop", "manny": "3×10–12 · RPE 7–8" } },
+						  "rx": { "sam": "30s — 3×10–12 · RPE 7–8", "manny": "3×10–12 · RPE 7–8" },
+						  "why": { "sam": "Cut for time last week — right call; curls are the first thing to drop." } },
 						{ "id": "machine_dip", "for": "both", "sets": 3, "reps": 15,
-						  "rx": { "sam": "220–235 — 3×12–15 · push to RPE 9–10 if you like", "manny": "3×12–15 · push to RPE 9–10 if you like" } }
+						  "rx": { "sam": "220–235 — 3×12–15 · RPE 8–10", "manny": "3×12–15 · RPE 8–10" },
+						  "why": "Isolation finisher — 9–10 is licensed here." }
 					]
 				},
 				{
@@ -244,27 +263,35 @@
 					"key": "fri", "title": "Bench Triples",
 					"exercises": [
 						{ "id": "bench_moderate", "for": "both", "sets": 5, "reps": 3, "pct": { "sam": 90.5, "manny": 77.5 },
-						  "rx": { "sam": "285 lb — 5×3 (90.5%) · RPE 6–7 · moved here off the Thursday rest so the triples are fresh — 275 was 6/6/6.5/7/7 the day after close-grip · set 1 a 6 → 290 for the rest; set 1 over 7 → 280", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7 · held (no log) · 270 if last week's sets were 6s" } },
-						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12,
-						  "rx": { "sam": "3×12 · RPE 7–8 · if energy's gone, this is still the right one to cut", "manny": "3×12 · RPE 7–8" } },
-						{ "id": "machine_row", "for": "sam", "sets": 3, "reps": 10, "rx": "170 lb — 3×10 · RPE 7–8 · 160 went 7/7.5/8 → +10 · your Friday row has its own history from here (DB lawnmower only if it's taken)" },
-						{ "id": "oa_row", "for": "manny", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower) · the −10% stands until I see a weight" },
+						  "rx": { "sam": "285 lb — 5×3 (90.5%) · RPE 6–7", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7" },
+						  "why": { "sam": "Moved here off the Thursday rest so the triples are fresh — 275 was 6/6/6.5/7/7 the day after close-grip. Set 1 a 6 → 290 for the rest; set 1 over 7 → 280.", "manny": "Held (no log). 270 if last week's sets were 6s." } },
+						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8",
+						  "why": { "sam": "If energy's gone, this is still the right one to cut." } },
+						{ "id": "machine_row", "for": "sam", "sets": 3, "reps": 10, "rx": "170 lb — 3×10 · RPE 7–8",
+						  "why": "160 went 7/7.5/8 → +10. Your Friday row has its own history from here; DB lawnmower only if the machine's taken." },
+						{ "id": "oa_row", "for": "manny", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench",
+						  "why": "The −10% from week 1 stands until I see a weight." },
 						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15,
-						  "rx": { "sam": "one notch up from 21.5 — 3×12–15 · RPE 7–8 · 12/15/15 @8/8.5/9 says it's ready", "manny": "3×12–15 · RPE 7–8" } }
+						  "rx": { "sam": "one notch up from 21.5 — 3×12–15 · RPE 7–8", "manny": "3×12–15 · RPE 7–8" },
+						  "why": { "sam": "12/15/15 @8/8.5/9 says it's ready." } }
 					]
 				},
 				{
 					"key": "sat", "title": "Close-Grip + Pull",
 					"exercises": [
 						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6,
-						  "rx": { "sam": "255 lb — 4×6 · RPE 7–8 · now the day AFTER the triples — hold 255; if set 1 is over 8, 245 · this is the day that absorbs the fatigue, not the triples", "manny": "4×6 · RPE 7–8 · same weight as last week — LOG it · +5 if all four sets were ≤7" } },
+						  "rx": { "sam": "255 lb — 4×6 · RPE 7–8", "manny": "4×6 · RPE 7–8 · same weight as last week" },
+						  "why": { "sam": "Now the day after the triples — hold 255; if set 1 is over 8, 245. This is the day that absorbs the fatigue, not the triples.", "manny": "LOG it. +5 if all four sets were ≤7." } },
 						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 86 },
-						  "rx": { "sam": "365 lb — 3×3 (86%) · cap RPE 7 · 345 was flat 6s and you flagged easy → +20 · if set 1 reads over 7, back to 345 for sets 2–3", "manny": "3×5 · RPE 6–7 · still need to know WHERE the discomfort bites — ✎ note it · knee → RDL 3×6 instead (hips back, knees soft) · back → skip it" } },
-						{ "id": "pullups", "for": "both", "sets": 3,
-						  "rx": { "sam": "3 × AMRAP · same grip · 9/7/7 twice and grip quit first — chalk or straps from set 2, make the back do the failing · 24 total to beat", "manny": "3 × AMRAP · same grip as last week" } },
+						  "rx": { "sam": "365 lb — 3×3 (86%) · cap RPE 7", "manny": "3×5 · RPE 6–7" },
+						  "why": { "sam": "345 was flat 6s and you flagged easy → +20. If set 1 reads over 7, back to 345 for sets 2–3.", "manny": "Still need to know WHERE the discomfort bites — ✎ note it. Knee → RDL 3×6 instead (hips back, knees soft). Back → skip it." } },
+						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · same grip",
+						  "why": { "sam": "9/7/7 twice and grip quit first — chalk or straps from set 2, make the back do the failing. 24 total to beat." } },
 						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10,
-						  "rx": { "sam": "65 lb — 3×8–10 · RPE 7–8 · 60 went 8/8/8 → +5", "manny": "3×8–10 · RPE 7–8" } },
-						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec · discomfort logged — keep it ≤3/10 or cut it" }
+						  "rx": { "sam": "65 lb — 3×8–10 · RPE 7–8", "manny": "3×8–10 · RPE 7–8" },
+						  "why": { "sam": "60 went 8/8/8 → +5." } },
+						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec",
+						  "why": "Discomfort logged — keep it ≤3/10 or cut it." }
 					]
 				},
 				{
@@ -283,7 +310,7 @@
 						{ "id": "bench_heavy", "for": "both", "sets": 3, "reps": 5, "pct": { "sam": 85, "manny": 82.5 },
 						  "rx": { "sam": "270 lb — 3×5 (85%) · RPE 7–8", "manny": "275 lb — 3×5 (82.5%) · RPE 7–8" } },
 						{ "id": "bench_backoff", "for": "both", "sets": 2, "reps": 8, "pct": { "sam": 75, "manny": 72.5 },
-						  "rx": { "sam": "235 lb — 2×6–8 (75%) · end the set at RPE 8.5", "manny": "245 lb — 2×8 (72.5%)" } },
+						  "rx": { "sam": "235 lb — 2×6–8 (75%) · stop at RPE 8.5", "manny": "245 lb — 2×8 (72.5%)" } },
 						{ "id": "cs_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "lat_pulldown", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "cable_pushdown", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" }
@@ -306,10 +333,10 @@
 					"exercises": [
 						{ "id": "bench_volume", "for": "both", "sets": 4, "reps": 6, "pct": { "sam": 79.5, "manny": 75 },
 						  "rx": { "sam": "250 lb — 4×6 (79.5%) · RPE 7–8", "manny": "250 lb — 4×6 (75%) · RPE 7–8" } },
-						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": { "sam": 8, "manny": 10 }, "rx": { "sam": "3×6–8 · STOP at RPE 8", "manny": "3×8–10 · RPE 7–8 (OHP swap OK)" } },
+						{ "id": "incline_bb", "for": "both", "sets": 3, "reps": { "sam": 8, "manny": 10 }, "rx": { "sam": "3×6–8 · stop at RPE 8", "manny": "3×8–10 · RPE 7–8 (OHP swap OK)" } },
 						{ "id": "cable_row", "for": "both", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
 						{ "id": "curls", "for": "both", "sets": 3, "reps": 12, "rx": "3×10–12 · RPE 7–8" },
-						{ "id": "machine_dip", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · push to RPE 9–10 if you like" }
+						{ "id": "machine_dip", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 8–10" }
 					]
 				},
 				{
@@ -322,7 +349,7 @@
 						  "rx": { "sam": "285 lb — 5×3 (90.5%) · RPE 6–7", "manny": "260 lb — 5×3 (77.5%) · RPE 6–7" } },
 						{ "id": "oh_ext", "for": "both", "sets": 3, "reps": 12, "rx": "3×12 · RPE 7–8" },
 						{ "id": "machine_row", "for": "sam", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8" },
-						{ "id": "oa_row", "for": "manny", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench (lawnmower)" },
+						{ "id": "oa_row", "for": "manny", "sets": 3, "reps": 10, "rx": "3×10 · RPE 7–8 · braced on bench" },
 						{ "id": "rope_pushdown", "for": "both", "sets": 3, "reps": 15, "rx": "3×12–15 · RPE 7–8" }
 					]
 				},
@@ -332,7 +359,7 @@
 						{ "id": "cg_bench", "for": "both", "sets": 4, "reps": 6, "rx": "4×6 · RPE 7–8" },
 						{ "id": "deadlift", "for": "both", "sets": 3, "reps": { "sam": 3, "manny": 5 }, "pct": { "sam": 86 },
 						  "rx": { "sam": "365 lb — 3×3 (86%) · cap RPE 7", "manny": "3×5 · RPE 6–7" } },
-						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · pick a grip, keep it consistent" },
+						{ "id": "pullups", "for": "both", "sets": 3, "rx": "3 × AMRAP · same grip" },
 						{ "id": "sat_curls", "for": "both", "sets": 3, "reps": 10, "rx": "3×8–10 · RPE 7–8" },
 						{ "id": "wall_sit", "for": "manny", "sets": 3, "rx": "3 × 45 sec" }
 					]

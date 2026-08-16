@@ -45,6 +45,10 @@ A training fact is computed in exactly ONE place and every consumer calls it:
   once in `program.json` → `library`; weeks carry only the prescription
   (`sets`/`reps`/`pct`/`rx`). Tagging a movement retroactively re-tags every set
   ever logged against it.
+- `rx` is the prescription and nothing else — weight, sets×reps, %, RPE window —
+  because it is what the LOG view shows in the gym. The coach's reasoning goes in
+  an optional `why` per exercise (string or `{sam, manny}`) and a `coach` note per
+  week; both render on the COACH tab only, never inside the workout.
 - derived numbers (e1RM, tonnage, hard sets, drift, adherence) live in
   `analytics.js`. `graphs.js` only draws what analytics returns — never
   recompute a training number in a chart.
@@ -54,7 +58,7 @@ A training fact is computed in exactly ONE place and every consumer calls it:
 ## Files
 - `program.json` — the current program (single source of truth, coach-written)
 - `analytics.js` — all derivation from the log (pure, no rendering)
-- `graphs.js` — SVG chart primitives + the Graphs and Program pages
+- `graphs.js` — SVG chart primitives + the Graphs, Coach and Program pages
 - `history/` — per-block compact summaries so old logs aren't re-read weekly
 - `index.html` / `style.css` / `app.js` — the app (no build step, no deps)
 - `sw.js` — network-first service worker (fresh online, functional offline)

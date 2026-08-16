@@ -9,7 +9,7 @@
 const LS_ENTRIES = "bb_entries_v1";
 const LS_PERSON = "bb_person";
 const LS_PROG = "bb_program_cache_v1";
-const APP_VERSION = "v2.1";
+const APP_VERSION = "v2.2";
 
 /* Fire-and-forget by necessity: a cross-origin form POST is opaque, so the
    browser cannot read a success response. Hence no-cors, "resend everything"
@@ -227,6 +227,7 @@ function renderAll() {
 	} else {
 		el("day-tabs").classList.add("hidden");
 		if (view === "graphs") renderGraphs();
+		else if (view === "coach") renderCoachView();
 		else renderProgramView();
 	}
 	renderFooter();
@@ -348,10 +349,14 @@ function renderDay() {
 			<div><button class="linkish" id="back-current">back to current week</button></div>
 		</div>`;
 
+	// the coach's reasoning lives on the COACH tab, never inside the workout;
+	// the day only gets a quiet pointer to it when there is something to read
+	const hasNotes = !!w.coach || day.exercises.some(ex => perPerson(ex.why, person));
 	html += `
 		<div class="day-head">
 			<div class="day-title">${esc(day.title)}</div>
 			<div class="day-actions">
+				${hasNotes ? `<button class="linkish" id="coach-notes">coach's notes</button>` : ""}
 				<button class="linkish" id="add-ex">+ add exercise</button>
 				${skip ? "" : `<button class="linkish danger" id="skip-day">skip today</button>`}
 			</div>
@@ -456,6 +461,8 @@ function feelRow(ex, date) {
 function wireDay(day, date) {
 	const back = el("back-current");
 	if (back) back.onclick = () => { viewWeek = prog.current_week; renderAll(); };
+	const notes = el("coach-notes");
+	if (notes) notes.onclick = () => { view = "coach"; renderAll(); };
 	document.querySelectorAll("[data-set-ex]").forEach(b => {
 		b.onclick = () => rpeModal(b.dataset.setEx, b.dataset.setName, Number(b.dataset.set), day.key, date);
 	});

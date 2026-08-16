@@ -365,6 +365,48 @@ function schemeLine(ex) {
 	return bits.join(" · ");
 }
 
+/* COACH tab: the reasoning behind this week's numbers. The LOG view stays
+   sets/reps/weight only (Sam's rule — explanations in the middle of a workout
+   are unreadable in the gym); everything the coach wants to say lives here,
+   per week, per exercise, with the active lifter's notes first. `why` on an
+   exercise and `coach` on a week are both optional. */
+function renderCoachView() {
+	el("checkin-slot").innerHTML = "";
+	const w = weekDef();
+	const order = [person, ...prog.people.filter(p => p !== person)];
+	const noteLines = why => {
+		if (!why) return "";
+		if (typeof why === "string") return `<div class="coach-note mine-line">${esc(why)}</div>`;
+		return order.filter(p => why[p]).map(p =>
+			`<div class="coach-note ${p === person ? "mine-line" : "not-yours"}"><span class="rx-tag ${p}">${p.toUpperCase()}</span> ${esc(why[p])}</div>`
+		).join("");
+	};
+	let html = `<div class="card">
+		<div class="graph-title">Coach's notes — Week ${w.week}</div>
+		<div class="graph-sub">wk of ${w.week_of}${w.label ? " · " + esc(w.label) : ""}</div>
+		${w.coach ? `<div class="coach-week">${esc(w.coach)}</div>` : `<div class="prog-scheme">No week note.</div>`}
+	</div>`;
+	let any = false;
+	for (const day of w.days) {
+		const noted = day.exercises.filter(ex => ex.why && (typeof ex.why === "string" || order.some(p => ex.why[p])));
+		if (!noted.length) continue;
+		any = true;
+		html += `<div class="card">
+			<div class="graph-title">${day.key.toUpperCase()} — ${esc(day.title)}</div>
+			${noted.map(ex => `<div class="prog-ex ${ex.for === "both" || ex.for === person ? "" : "not-yours"}">
+				<div class="prog-ex-name">${esc(ex.name)}${ex.for !== "both" ? `<span class="rx-tag ${ex.for}"> ${ex.for.toUpperCase()} ONLY</span>` : ""}</div>
+				${noteLines(ex.why)}
+			</div>`).join("")}
+		</div>`;
+	}
+	if (!any) html += `<div class="card"><div class="prog-scheme">No exercise notes this week — the numbers are the whole message.</div></div>`;
+	html += `<div class="card">
+		<div class="graph-title">Standing rules</div>
+		${(prog.rules || []).map(r => `<div class="reason">• ${esc(r)}</div>`).join("")}
+	</div>`;
+	el("day-card").innerHTML = html;
+}
+
 function renderProgramView() {
 	el("checkin-slot").innerHTML = "";
 	const w = weekDef();
